@@ -129,7 +129,7 @@ final class ImprovedMenusPanel extends PluginPanel
         contents.add(new JLabel("Copy to export; paste to preview an import."),BorderLayout.NORTH);
         contents.add(new JScrollPane(json),BorderLayout.CENTER);
         JPanel controls = new JPanel(new GridLayout(0,1,4,4));
-        JComboBox<String> source = new JComboBox<>(new String[]{"No Examine","No Misclicks In Bank","Item Option Hider","Menu Colorizer","Tool Required","Misclick Guard"});
+        JComboBox<String> source = new JComboBox<>(new String[]{"No Examine","No Misclicks In Bank","Item Option Hider","Menu Colorizer","Tool Required","Misclick Guard","No Use Player","Don't Telegrab NPCs"});
         controls.add(source);
         button(controls,"Read existing settings",() -> {
             Map<String,String> values = store.legacyPreview((String)source.getSelectedItem());

@@ -67,4 +67,18 @@ public class ProfileStoreTest
     { assertTrue(store.legacyPreview("Menu Colorizer").isEmpty()); }
     @Test public void clearHistoryDoesNotDeleteProfiles()
     { store.save("Normal"); store.apply(Collections.singletonMap("bankEat","true")); store.clearHistory(); assertFalse(store.undo()); assertEquals(1,store.names().size()); }
+    @Test public void newControlsRoundTripAndUndoWithoutTouchingSourceSettings()
+    {
+        Map<String,String> changes=new LinkedHashMap<>(); changes.put("hideCancel","true"); changes.put("hideWalkHere","true"); changes.put("noUsePlayer","true"); changes.put("noTelegrabNpc","true");
+        changes.put("playerUseItems","Knife,Weapon store key"); changes.put("telegrabNpcNames","Custom");
+        assertEquals(changes,store.previewImport(store.exportSettings(changes))); store.apply(changes); assertEquals("true",store.snapshot().get("hideCancel"));
+        assertTrue(store.undo()); assertEquals("false",store.snapshot().get("hideCancel"));
+    }
+    @Test public void sourceMenuCleanupSettingsAndTargetAllowListsImport()
+    {
+        values.put("noexamine/cancelEverywhere","true"); values.put("noexamine/walkHereEverywhere","true");
+        assertEquals("true",store.legacyPreview("No Examine").get("hideCancel")); assertEquals("true",store.legacyPreview("No Examine").get("hideWalkHere"));
+        values.put("no-use-player/whitelistItemsString","Knife"); values.put("donttelegrabnpcs/telegrabWhitelist","Custom");
+        assertEquals("Knife",store.legacyPreview("No Use Player").get("playerUseItems")); assertEquals("Custom",store.legacyPreview("Don't Telegrab NPCs").get("telegrabNpcNames"));
+    }
 }

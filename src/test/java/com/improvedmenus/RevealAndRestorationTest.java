@@ -17,7 +17,7 @@ public class RevealAndRestorationTest
         when(config.revealKey()).thenReturn(ImprovedMenusConfig.RevealKey.CONTROL);
         when(config.itemRules()).thenReturn("Drop,*"); when(config.colors()).thenReturn("Sword:Use:#ff0000"); when(config.exceptions()).thenReturn("");
         when(client.getCanvas()).thenReturn(new Canvas() { @Override public boolean hasFocus() { return true; } });
-        Injector injector=Guice.createInjector(new AbstractModule() { protected void configure() { bind(Client.class).toInstance(client); bind(ImprovedMenusConfig.class).toInstance(config); } });
+        Injector injector=Guice.createInjector(new AbstractModule() { protected void configure() { bind(net.runelite.client.game.ItemManager.class).toInstance(mock(net.runelite.client.game.ItemManager.class)); bind(Client.class).toInstance(client); bind(ImprovedMenusConfig.class).toInstance(config); } });
         engine=injector.getInstance(MenuEngine.class); reveal=injector.getInstance(RevealState.class); engine.reload();
     }
     @Test public void ctrlRevealPausesOwnedFilters()

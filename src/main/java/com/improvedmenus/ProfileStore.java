@@ -118,7 +118,11 @@ final class ProfileStore
                 legacy(result,"noexamine","examineNpcs","examineNpc");
                 legacy(result,"noexamine","examineObjects","examineObject");
                 legacy(result,"noexamine","keepLonelyExamineNpcs","keepLoneNpc");
-                legacy(result,"noexamine","keepLonelyExamineObjects","keepLoneObject"); break;
+                legacy(result,"noexamine","keepLonelyExamineObjects","keepLoneObject");
+                legacy(result,"noexamine","cancelEverywhere","hideCancel");
+                legacy(result,"noexamine","walkHereEverywhere","hideWalkHere"); break;
+            case "No Use Player": legacy(result,"no-use-player","whitelistItemsString","playerUseItems"); break;
+            case "Don't Telegrab NPCs": legacy(result,"donttelegrabnpcs","telegrabWhitelist","telegrabNpcNames"); break;
             case "No Misclicks In Bank":
                 legacy(result,"nowieldinbank","hideWield","bankWield"); legacy(result,"nowieldinbank","hideWear","bankWear");
                 legacy(result,"nowieldinbank","hideDrink","bankDrink"); legacy(result,"nowieldinbank","hideEat","bankEat"); break;

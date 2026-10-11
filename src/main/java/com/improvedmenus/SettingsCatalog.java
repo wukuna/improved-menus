@@ -25,9 +25,7 @@ final class SettingsCatalog
     static
     {
         add("revealKey", "Hold to reveal", "General", "CONTROL", "CONTROL", "SHIFT", "ALT", "NONE");
-        bool("potionEmpty", "Protect potion Empty", "Inventory", false);
-        bool("bankWield", "Hide Wield", "Bank", false); bool("bankWear", "Hide Wear", "Bank", false);
-        bool("bankDrink", "Hide Drink", "Bank", false); bool("bankEat", "Hide Eat", "Bank", false);
+        bool("potionEmpty", "No Empty on potions", "Inventory", false);
         bool("examineInventory", "Hide item Examine", "Examine", false); bool("examineGround", "Hide ground Examine", "Examine", false);
         bool("examineNpc", "Hide NPC Examine", "Examine", false); bool("examineObject", "Hide scenery Examine", "Examine", false);
         bool("keepLoneNpc", "Keep lone NPC Examine", "Examine", true); bool("keepLoneObject", "Keep lone scenery Examine", "Examine", true);
@@ -44,6 +42,14 @@ final class SettingsCatalog
         bool("deprioritizeLeftClickOffEntries", "Deprioritize protected buttons", "Buttons", true);
         bool("groundIcons", "Ground loot icons", "Presentation", false);
         bool("optionCount", "Additional option count", "Presentation", false);
+        bool("hideCancel", "Hide Cancel (right-click menu)", "Menu cleanup", false);
+        bool("hideWalkHere", "Hide Walk here (right-click menu)", "Menu cleanup", false);
+        bool("noUsePlayer", "No Use on Player", "Target protection", false);
+        add("playerUseItems", "Allow items on players (comma separated)", "Target protection", TargetProtections.DEFAULT_PLAYER_ITEMS);
+        bool("noTelegrabNpc", "Don't Telegrab NPCs", "Target protection", false);
+        add("telegrabNpcNames", "Allow Telegrab NPC names (comma separated)", "Target protection", "");
+        bool("bankWield", "Hide Wield", "Bank", false); bool("bankWear", "Hide Wear", "Bank", false);
+        bool("bankDrink", "Hide Drink", "Bank", false); bool("bankEat", "Hide Eat", "Bank", false);
     }
     private static void bool(String key, String label, String section, boolean value) { add(key,label,section,Boolean.toString(value),"false","true"); }
     private static void add(String key, String label, String section, String value, String... choices) { ALL.put(key,new Setting(key,label,section,value,choices)); }

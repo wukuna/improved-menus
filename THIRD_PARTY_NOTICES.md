@@ -4,6 +4,8 @@ These projects informed the feature design. Adapted code and catalogs are noted 
 
 Adaptations in this release:
 
+- `TargetProtections` retains No Use Player's default allowed-item list (Copyright 2024 Lola Egherman) and Don't Telegrab NPCs' useful-target catalog (Copyright 2025 ldavid432). Both complete BSD 2-Clause licenses are retained in its header and the distributed license resources. The selection checks and menu filtering are newly implemented for the shared engine.
+
 - `ButtonGuard`, `GuardedAction` and `ClickMode` derive from Misclick Guard (Copyright 2026 willzero123). Original BSD 2-Clause headers are retained; client-thread cleanup, shared reveal and captured-widget restoration were added.
 - `ToolCatalog` derives from Tool Required (Copyright 2024 Unmoon). It retains the published axe/pickaxe list and special tree targets without depending on the clue-scroll plugin implementation.
 - `HomeCatalog` derives from Home Improvement (Copyright 2024 Mike-U5), including its Mahogany Homes furniture mappings. House region constants were checked against No Examine. The new implementation preserves non-Remove furniture actions.
@@ -11,6 +13,20 @@ Adaptations in this release:
 - The other filtering, coloring, profiles, editor and count implementation is independently written from the documented behavior. The README credits all feature sources and states coverage differences.
 
 Each complete source license is retained in the corresponding file below `src/main/resources/META-INF/licenses`, including copyright notices, redistribution conditions and disclaimers. The jar includes these same resources for binary distribution.
+
+## no-use-player
+
+```
+repository=https://github.com/oohwooh/no-use-players.git
+commit=e76b5612cea2f9fe68b0ba6cecd2bf11b1a5d656
+```
+
+## dont-telegrab-npcs
+
+```
+repository=https://github.com/ldavid432/dont-telekinetic-grab-npcs.git
+commit=71b6675364d67a65eb0023667c42863eeb0e3ea7
+```
 
 ## ground-loot-icons
 

@@ -9,15 +9,15 @@ public interface ImprovedMenusConfig extends Config
     enum RevealKey { CONTROL, SHIFT, ALT, NONE }
     @ConfigItem(keyName="revealKey", name="Hold to reveal", description="Hold before opening a menu to reveal options hidden by Menu Workshop", position=0)
     default RevealKey revealKey() { return RevealKey.CONTROL; }
-    @ConfigItem(keyName="potionEmpty", name="Protect potion Empty", description="Hide Empty on dosed inventory potions", position=1)
+    @ConfigItem(keyName="potionEmpty", name="No Empty on potions", description="Hide Empty on dosed inventory potions", position=1)
     default boolean potionEmpty() { return false; }
-    @ConfigItem(keyName="bankWield", name="Bank: hide Wield", description="Hide inventory Wield while the bank is open", position=2)
+    @ConfigItem(keyName="bankWield", name="Bank: hide Wield", description="Hide inventory Wield while the bank is open", position=35)
     default boolean bankWield() { return false; }
-    @ConfigItem(keyName="bankWear", name="Bank: hide Wear", description="Hide inventory Wear while the bank is open", position=3)
+    @ConfigItem(keyName="bankWear", name="Bank: hide Wear", description="Hide inventory Wear while the bank is open", position=36)
     default boolean bankWear() { return false; }
-    @ConfigItem(keyName="bankDrink", name="Bank: hide Drink", description="Hide inventory Drink while the bank is open", position=4)
+    @ConfigItem(keyName="bankDrink", name="Bank: hide Drink", description="Hide inventory Drink while the bank is open", position=37)
     default boolean bankDrink() { return false; }
-    @ConfigItem(keyName="bankEat", name="Bank: hide Eat", description="Hide inventory Eat while the bank is open", position=5)
+    @ConfigItem(keyName="bankEat", name="Bank: hide Eat", description="Hide inventory Eat while the bank is open", position=38)
     default boolean bankEat() { return false; }
     @ConfigItem(keyName="examineInventory", name="Hide inventory Examine", description="Remove item Examine entries", position=6)
     default boolean examineInventory() { return false; }
@@ -63,4 +63,16 @@ public interface ImprovedMenusConfig extends Config
     default boolean groundIcons() { return false; }
     @ConfigItem(keyName="optionCount", name="Additional option count", description="Show the number of other available actions on hover", position=27)
     default boolean optionCount() { return false; }
+    @ConfigItem(keyName="hideCancel", name="Hide Cancel", description="Hide Cancel in opened right-click menus; keep a safe fallback if nothing remains", position=28)
+    default boolean hideCancel() { return false; }
+    @ConfigItem(keyName="hideWalkHere", name="Hide Walk here", description="Hide Walk here in opened right-click menus; normal left-click walking stays available", position=29)
+    default boolean hideWalkHere() { return false; }
+    @ConfigItem(keyName="noUsePlayer", name="No Use on Player", description="Hide item Use on players; preserve spells and allowlisted items", position=30)
+    default boolean noUsePlayer() { return false; }
+    @ConfigItem(keyName="playerUseItems", name="Allow items on players", description="Allowed item names, separated by commas", position=31)
+    default String playerUseItems() { return TargetProtections.DEFAULT_PLAYER_ITEMS; }
+    @ConfigItem(keyName="noTelegrabNpc", name="Don't Telegrab NPCs", description="Hide Telekinetic Grab on NPCs, preserving known quest, training and Sailing targets", position=32)
+    default boolean noTelegrabNpc() { return false; }
+    @ConfigItem(keyName="telegrabNpcNames", name="Allow Telegrab NPC names", description="Additional allowed NPC names, separated by commas", position=33)
+    default String telegrabNpcNames() { return ""; }
 }

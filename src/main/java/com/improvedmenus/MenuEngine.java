@@ -25,6 +25,7 @@ final class MenuEngine
     @Inject private Client client;
     @Inject private ImprovedMenusConfig config;
     @Inject private RevealState reveal;
+    @Inject private TargetProtections targets;
     private List<MenuRules.Rule> itemRules = Collections.emptyList();
     private List<MenuRules.Rule> colors = Collections.emptyList();
     private List<MenuRules.Rule> exceptions = Collections.emptyList();
@@ -67,12 +68,50 @@ final class MenuEngine
         Context context = context();
         int before=menu.getMenuEntries().length;
         apply(menu, "", context, report, 0);
+        if (!capture) { cleanOpenedMenu(menu,report,0); }
         if (capture || before != menu.getMenuEntries().length)
         {
             String result = "Before: " + before + " entries. After: " + menu.getMenuEntries().length + " entries.\n"
                 + (report.length() == 0 ? "No changes to this menu." : report.toString());
             diagnostics = capture ? result : diagnostics + "\nOn opening:\n" + result;
         }
+    }
+    void applyTargetProtections(Menu menu)
+    {
+        if (menu == null || reveal.isRevealed() || !client.isWidgetSelected()) { return; }
+        MenuEntry[] entries = menu.getMenuEntries();
+        List<MenuEntry> kept = new ArrayList<>(entries.length);
+        StringBuilder report = new StringBuilder();
+        for (MenuEntry entry : entries)
+        {
+            String reason = targets.reason(entry);
+            if (reason == null) { kept.add(entry); }
+            else { report.append("\nHide ").append(MenuRules.plain(entry.getOption())).append(" — ").append(reason); }
+        }
+        if (kept.size() != entries.length)
+        {
+            menu.setMenuEntries(kept.toArray(new MenuEntry[0]));
+            diagnostics = "Before: " + entries.length + " entries. After: " + kept.size() + " entries.\n" + report;
+        }
+    }
+    private void cleanOpenedMenu(Menu menu,StringBuilder report,int depth)
+    {
+        if (depth > 8) { return; }
+        MenuEntry[] entries = menu.getMenuEntries();
+        List<MenuEntry> kept = new ArrayList<>(entries.length);
+        MenuEntry cancel = null;
+        for (MenuEntry entry : entries)
+        {
+            if (entry.getSubMenu() != null) { cleanOpenedMenu(entry.getSubMenu(),report,depth+1); }
+            if (entry.getType() == MenuAction.CANCEL) { cancel = entry; }
+            boolean hide = entry.getType() == MenuAction.CANCEL && config.hideCancel()
+                || entry.getType() == MenuAction.WALK && config.hideWalkHere();
+            if (!hide) { kept.add(entry); }
+            else if (report.length() < 12000) { report.append("\nHide ").append(MenuRules.plain(entry.getOption())).append(" — right-click menu cleanup"); }
+        }
+        // Never turn Cancel into a default game action or leave an empty root menu.
+        if (kept.isEmpty() && cancel != null) { kept.add(cancel); report.append("\nKeep Cancel — empty-menu fallback"); }
+        if (kept.size() != entries.length) { menu.setMenuEntries(kept.toArray(new MenuEntry[0])); }
     }
     private void apply(Menu menu, String inheritedTarget, Context context, StringBuilder report, int depth)
     {
@@ -124,6 +163,8 @@ final class MenuEngine
     String reason(MenuEntry entry, MenuEntry[] siblings, String target, String option, Context c)
     {
         MenuAction type = entry.getType();
+        String targetReason = targets.reason(entry);
+        if (targetReason != null) { return targetReason; }
         boolean item = isItem(entry);
         boolean inventory = item && inventoryGroup(entry);
         boolean ground = type == MenuAction.EXAMINE_ITEM_GROUND || type == MenuAction.GROUND_ITEM_FIRST_OPTION

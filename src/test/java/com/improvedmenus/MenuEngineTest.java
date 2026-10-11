@@ -21,7 +21,7 @@ public class MenuEngineTest
         client=mock(Client.class); config=mock(ImprovedMenusConfig.class);
         when(config.revealKey()).thenReturn(ImprovedMenusConfig.RevealKey.NONE);
         when(config.itemRules()).thenReturn(""); when(config.colors()).thenReturn(""); when(config.exceptions()).thenReturn("");
-        engine=Guice.createInjector(new AbstractModule() { protected void configure() { bind(Client.class).toInstance(client); bind(ImprovedMenusConfig.class).toInstance(config); } }).getInstance(MenuEngine.class);
+        engine=Guice.createInjector(new AbstractModule() { protected void configure() { bind(net.runelite.client.game.ItemManager.class).toInstance(mock(net.runelite.client.game.ItemManager.class)); bind(Client.class).toInstance(client); bind(ImprovedMenusConfig.class).toInstance(config); } }).getInstance(MenuEngine.class);
         engine.reload();
     }
     private MenuEntry item(String option,String target) { return TestMenus.entry(option,target,MenuAction.CC_OP,100,InterfaceID.INVENTORY); }

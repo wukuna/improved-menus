@@ -65,6 +65,8 @@ public class ImprovedMenusPlugin extends Plugin
     }
     @Subscribe(priority=-0.5f) public void onPostMenuSort(PostMenuSort event)
     { if (!client.isMenuOpen()) { engine.apply(client.getMenu()); } }
+    @Subscribe(priority=-1) public void onClientTick(ClientTick event)
+    { if (client.getGameState() == GameState.LOGGED_IN && !client.isMenuOpen()) { engine.applyTargetProtections(client.getMenu()); } }
     @Subscribe(priority=-2) public void onMenuOpened(MenuOpened event)
     {
         engine.applyOpened(client.getMenu()); presentation.decorate(client.getMenu());
