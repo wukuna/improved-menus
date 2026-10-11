@@ -87,6 +87,21 @@ final class ImprovedMenusPanel extends PluginPanel
                 box.setSelectedItem(store.value(s));
                 box.addActionListener(e -> run(() -> store.apply(Collections.singletonMap(s.key,(String)box.getSelectedItem())))); row.add(box);
             }
+            else if (s.key.equals("minimumOptions"))
+            {
+                row.add(new JLabel(s.label));
+                int count=1;
+                try { s.validate(store.value(s)); count=Integer.parseInt(store.value(s)); } catch (IllegalArgumentException ignored) { }
+                JSpinner spinner=new JSpinner(new SpinnerNumberModel(count,1,500,1));
+                spinner.addChangeListener(e -> run(() -> store.apply(Collections.singletonMap(s.key,spinner.getValue().toString())))); row.add(spinner);
+            }
+            else if (s.key.equals("defaultPickerColor") || s.key.equals("optionCountColor"))
+            {
+                button(row,s.label,() -> {
+                    Color color=JColorChooser.showDialog(this,s.label,SettingsCatalog.colorOrDefault(store.value(s),Color.WHITE));
+                    if (color != null) { store.apply(Collections.singletonMap(s.key,String.format("#%06x",color.getRGB() & 0xffffff))); }
+                });
+            }
             else
             {
                 row.add(new JLabel(s.label)); JTextArea area = new JTextArea(store.value(s),4,16);
@@ -129,7 +144,7 @@ final class ImprovedMenusPanel extends PluginPanel
         contents.add(new JLabel("Copy to export; paste to preview an import."),BorderLayout.NORTH);
         contents.add(new JScrollPane(json),BorderLayout.CENTER);
         JPanel controls = new JPanel(new GridLayout(0,1,4,4));
-        JComboBox<String> source = new JComboBox<>(new String[]{"No Examine","No Misclicks In Bank","Item Option Hider","Menu Colorizer","Tool Required","Misclick Guard","No Use Player","Don't Telegrab NPCs"});
+        JComboBox<String> source = new JComboBox<>(new String[]{"No Examine","No Misclicks In Bank","Item Option Hider","Menu Colorizer","Tool Required","Misclick Guard","No Use Player","Don't Telegrab NPCs","Mouseover Options+"});
         controls.add(source);
         button(controls,"Read existing settings",() -> {
             Map<String,String> values = store.legacyPreview((String)source.getSelectedItem());

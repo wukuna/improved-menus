@@ -75,4 +75,17 @@ public interface ImprovedMenusConfig extends Config
     default boolean noTelegrabNpc() { return false; }
     @ConfigItem(keyName="telegrabNpcNames", name="Allow Telegrab NPC names", description="Additional allowed NPC names, separated by commas", position=33)
     default String telegrabNpcNames() { return ""; }
+    @ConfigItem(keyName="hideSetHeading", name="Hide Set heading", description="Hide Set heading in opened right-click menus", position=34)
+    default boolean hideSetHeading() { return false; }
+    @ConfigItem(keyName="minimumOptions", name="Minimum extra options", description="Only show the option count at or above this number", position=39)
+    @Range(min=1,max=500)
+    default int minimumOptions() { return 1; }
+    @ConfigItem(keyName="countExamine", name="Count Examine", description="Include Examine in the additional-option count", position=40)
+    default boolean countExamine() { return true; }
+    @ConfigItem(keyName="countOnWidgets", name="Show count on interface widgets", description="Show counts on inventory, bank, shop and other interface widgets", position=41)
+    default boolean countOnWidgets() { return true; }
+    @ConfigItem(keyName="optionCountColor", name="Option count text color", description="Color in #RRGGBB format", position=42)
+    default String optionCountColor() { return "#ffffff"; }
+    @ConfigItem(keyName="defaultPickerColor", name="Default picker color", description="Initial color for entries with no matching color rule, in #RRGGBB format", position=43)
+    default String defaultPickerColor() { return "#00ff00"; }
 }

@@ -105,7 +105,8 @@ final class MenuEngine
             if (entry.getSubMenu() != null) { cleanOpenedMenu(entry.getSubMenu(),report,depth+1); }
             if (entry.getType() == MenuAction.CANCEL) { cancel = entry; }
             boolean hide = entry.getType() == MenuAction.CANCEL && config.hideCancel()
-                || entry.getType() == MenuAction.WALK && config.hideWalkHere();
+                || entry.getType() == MenuAction.WALK && config.hideWalkHere()
+                || entry.getType() == MenuAction.SET_HEADING && config.hideSetHeading();
             if (!hide) { kept.add(entry); }
             else if (report.length() < 12000) { report.append("\nHide ").append(MenuRules.plain(entry.getOption())).append(" — right-click menu cleanup"); }
         }

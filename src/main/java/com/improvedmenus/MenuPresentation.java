@@ -71,17 +71,26 @@ final class MenuPresentation extends Overlay
         }
         else if (config.optionCount())
         {
-            int count=additionalCount(client.getMenu().getMenuEntries());
-            if (count > 0 && client.getMouseCanvasPosition().getX() >= 0) { tooltips.add(new Tooltip("+" + count + " options")); }
+            int count=additionalCount(client.getMenu().getMenuEntries(),config.countExamine(),config.countOnWidgets());
+            if (count >= Math.max(1,config.minimumOptions()) && client.getMouseCanvasPosition().getX() >= 0)
+            {
+                java.awt.Color color=SettingsCatalog.colorOrDefault(config.optionCountColor(),java.awt.Color.WHITE);
+                tooltips.add(new Tooltip(String.format("<col=%06x>+%d options</col>",color.getRGB() & 0xffffff,count)));
+            }
         }
         return null;
     }
     static int additionalCount(MenuEntry[] entries)
+    { return additionalCount(entries,true,true); }
+    static int additionalCount(MenuEntry[] entries,boolean countExamine,boolean countOnWidgets)
     {
         int count=0;
         for (MenuEntry entry : entries)
         {
             MenuAction type=entry.getType();
+            if (!countOnWidgets && entry.getWidget() != null) { continue; }
+            if (!countExamine && (type == MenuAction.EXAMINE_NPC || type == MenuAction.EXAMINE_OBJECT
+                || type == MenuAction.EXAMINE_ITEM_GROUND || MenuRules.plain(entry.getOption()).equalsIgnoreCase("Examine"))) { continue; }
             if (type != MenuAction.CANCEL && type != MenuAction.WALK && type != MenuAction.WIDGET_CONTINUE
                 && type != MenuAction.RUNELITE && type != MenuAction.RUNELITE_OVERLAY && type != MenuAction.RUNELITE_OVERLAY_CONFIG)
             { count++; }

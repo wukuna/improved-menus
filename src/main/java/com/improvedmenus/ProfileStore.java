@@ -120,7 +120,8 @@ final class ProfileStore
                 legacy(result,"noexamine","keepLonelyExamineNpcs","keepLoneNpc");
                 legacy(result,"noexamine","keepLonelyExamineObjects","keepLoneObject");
                 legacy(result,"noexamine","cancelEverywhere","hideCancel");
-                legacy(result,"noexamine","walkHereEverywhere","hideWalkHere"); break;
+                legacy(result,"noexamine","walkHereEverywhere","hideWalkHere");
+                legacy(result,"noexamine","setHeadingEverywhere","hideSetHeading"); break;
             case "No Use Player": legacy(result,"no-use-player","whitelistItemsString","playerUseItems"); break;
             case "Don't Telegrab NPCs": legacy(result,"donttelegrabnpcs","telegrabWhitelist","telegrabNpcNames"); break;
             case "No Misclicks In Bank":
@@ -129,7 +130,13 @@ final class ProfileStore
             case "Item Option Hider": legacy(result,"itemoptionhider","hides","itemRules"); break;
             case "Menu Colorizer":
                 legacy(result,"menucolorizer","colorMappings","colors"); legacy(result,"menucolorizer","enableColoring","enableColors");
-                legacy(result,"menucolorizer","showTagOptions","colorPicker"); break;
+                legacy(result,"menucolorizer","showTagOptions","colorPicker");
+                legacyColor(result,"menucolorizer","defaultPickerColor","defaultPickerColor"); break;
+            case "Mouseover Options+":
+                legacy(result,"mouseoveroptions","minimumOptions","minimumOptions");
+                legacy(result,"mouseoveroptions","includeExamine","countExamine");
+                legacy(result,"mouseoveroptions","showOnWidgets","countOnWidgets");
+                legacyColor(result,"mouseoveroptions","textColor","optionCountColor"); break;
             case "Tool Required": legacy(result,"tool-required","chopDown","chop"); legacy(result,"tool-required","mine","mine"); break;
             case "Misclick Guard":
                 for (String key : Arrays.asList("autoRetaliate","xpDrops","alwaysSetPlaceholders","report","deprioritizeLeftClickOffEntries"))
@@ -142,5 +149,12 @@ final class ProfileStore
     {
         String raw = manager.getConfiguration(group,oldKey);
         if (raw != null) { result.put(key,raw); }
+    }
+    private void legacyColor(Map<String,String> result,String group,String oldKey,String key)
+    {
+        String raw=manager.getConfiguration(group,oldKey);
+        if (raw == null) { return; }
+        try { result.put(key,String.format("#%06x",java.awt.Color.decode(raw).getRGB() & 0xffffff)); }
+        catch (NumberFormatException e) { throw new IllegalArgumentException("Invalid saved color for " + oldKey); }
     }
 }

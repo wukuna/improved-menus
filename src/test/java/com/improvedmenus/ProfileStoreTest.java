@@ -81,4 +81,26 @@ public class ProfileStoreTest
         values.put("no-use-player/whitelistItemsString","Knife"); values.put("donttelegrabnpcs/telegrabWhitelist","Custom");
         assertEquals("Knife",store.legacyPreview("No Use Player").get("playerUseItems")); assertEquals("Custom",store.legacyPreview("Don't Telegrab NPCs").get("telegrabNpcNames"));
     }
+    @Test public void presentationSettingsImportAndUndo()
+    {
+        values.put("mouseoveroptions/minimumOptions","3"); values.put("mouseoveroptions/includeExamine","false");
+        values.put("mouseoveroptions/showOnWidgets","false"); values.put("mouseoveroptions/textColor",Integer.toString(0xff123abc));
+        Map<String,String> imported=store.legacyPreview("Mouseover Options+");
+        assertEquals("#123abc",imported.get("optionCountColor")); assertEquals("3",imported.get("minimumOptions"));
+        assertEquals("false",imported.get("countExamine")); assertEquals("false",imported.get("countOnWidgets"));
+        store.apply(imported); assertTrue(store.undo()); assertEquals("1",store.snapshot().get("minimumOptions"));
+        values.put("menucolorizer/defaultPickerColor",Integer.toString(0xffaabbcc)); assertEquals("#aabbcc",store.legacyPreview("Menu Colorizer").get("defaultPickerColor"));
+        values.put("noexamine/setHeadingEverywhere","true"); assertEquals("true",store.legacyPreview("No Examine").get("hideSetHeading"));
+    }
+    @Test public void invalidThresholdAndColorRejectEntireImportBeforeWriting()
+    {
+        for (String bad : Arrays.asList("0","501","1.5","many"))
+        {
+            try { store.apply(Collections.singletonMap("minimumOptions",bad)); fail(); } catch (IllegalArgumentException expected) { assertTrue(values.isEmpty()); }
+        }
+        for (String key : Arrays.asList("defaultPickerColor","optionCountColor"))
+        {
+            try { store.apply(Collections.singletonMap(key,"<img=3>")); fail(); } catch (IllegalArgumentException expected) { assertTrue(values.isEmpty()); }
+        }
+    }
 }

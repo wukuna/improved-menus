@@ -7,12 +7,12 @@ Independent RuneLite menu protections, item rules, colors and profiles in one se
 - **Inventory:** protect potion Empty, hide selected item actions by name, and support item-on-item Use targets.
 - **Bank:** independently hide inventory Wield, Wear, Drink and Eat while the bank is open. Deposit and withdraw actions are preserved.
 - **Examine:** separate inventory, ground-item, NPC and scenery switches, with options to keep Examine when it is the only action.
-- **Menu cleanup:** independently hide Cancel and Walk here in opened right-click menus. Normal left-click walking and button-protection fallback remain available. Cancel is retained when hiding it would leave an empty menu.
+- **Menu cleanup:** independently hide Cancel, Walk here and Set heading in opened right-click menus. Normal left-click walking/heading and button-protection fallback remain available. Cancel is retained when hiding it would leave an empty menu.
 - **Target protection:** hide item Use on players, with a configurable allowed-item list; spell casts and other player actions are preserved. Hide Telekinetic Grab on NPCs while preserving ground-item casts, other spells, known useful targets and custom NPC-name exceptions.
 - **Tools:** hide tree Chop/Cut or rock Mine when the required axe or pickaxe is neither carried nor equipped. Unknown inventory state leaves actions available.
 - **House:** hide building actions outside building mode, plus unnecessary Mahogany Homes Remove actions. Other furniture actions stay available.
 - **Buttons:** normal, right-click-only or hidden modes for Auto Retaliate, XP Drops, bank placeholders and Report. Right-click-only checks where the click began; it does not merely move the action down the list.
-- **Presentation:** action colors, wildcard mappings, submenu support, a Shift-menu color picker/reset, optional ground-loot icons and additional-option counts.
+- **Presentation:** action colors, wildcard mappings, submenu support, a Shift-menu color picker/reset with configurable default color, optional ground-loot icons and additional-option counts. Counts support a minimum threshold, including/excluding Examine, showing/hiding counts on interface widgets, and a configurable text color.
 - **Shared editor:** search, name/context exceptions, diagnostics showing the before/after entry counts and reasons, named profiles, selective reset, twenty-step undo, and validated import/export previews.
 
 Protection switches start off. Enable the features you want in the sidebar or RuneLite settings. Button modes start at Normal. Hold **Ctrl before opening a menu** to reveal options hidden by this plugin. The reveal modifier can be changed to Shift, Alt or None. It does not consume keys or recreate options removed by another plugin.
@@ -44,6 +44,8 @@ Menu colors use `target:action:#RRGGBB`, separated by semicolons:
 
 Exact color mappings take precedence over wildcard mappings. Hold Shift when opening a menu to use the local color editor. Reset removes that entry's exact mapping; a broader wildcard can still apply.
 
+**Default picker color** applies when an entry has no matching color mapping. **Option count text color** changes the hover count. Both colors use `#RRGGBB` in RuneLite settings, with color pickers in the sidebar. **Minimum extra options** accepts 1–500. Counts exclude Cancel, Walk here and local editor actions; **Count Examine** and **Show count on interface widgets** control the remaining categories. These settings are included in profiles, undo and imports.
+
 The editor accepts at most 200 rules per field. Invalid manual configuration edits disable that rule field rather than retaining old invisible rules. Profile imports validate every setting before applying changes. Imports cannot modify other plugins' settings. Existing-setting import reads explicitly saved settings from the supported plugins listed below and leaves those originals intact. Missing settings and source-plugin enablement are not inferred.
 
 ## Other mods / sources
@@ -52,7 +54,7 @@ This project combines features from, and credits, these plugins. Links identify 
 
 | Source plugin | Features included |
 |---|---|
-| [No Examine](https://github.com/Skretzo/runelite-plugins/tree/ea506dbbfd2aa70dd024f2fc7b761786e2ced91a) | Category-specific Examine removal, keeping lone Examine, right-click Cancel and Walk here cleanup |
+| [No Examine](https://github.com/Skretzo/runelite-plugins/tree/ea506dbbfd2aa70dd024f2fc7b761786e2ced91a) | Category-specific Examine removal, keeping lone Examine, right-click Cancel/Walk here/Set heading cleanup |
 | [Not Empty](https://github.com/dekvall/runelite-external-plugins/tree/0c1c5cf2a8588ac3b017e7026c393d2eee4980c3) | Dosed-item Empty protection |
 | [No Misclicks In Bank](https://github.com/Welkon1/No-Misclicks-In-Bank/tree/6f76aa102a04525bdce2424b57b4ad899ba82e8b) | Independent Wield, Wear, Drink and Eat bank guards |
 | [Item Option Hider](https://github.com/kekingbd/item-option-hider/tree/5375d699a8661c157c7e26b699a9c46401237c7e) | Item action/name rules, wildcards and item-on-item targets |
@@ -61,11 +63,11 @@ This project combines features from, and credits, these plugins. Links identify 
 | [Home Improvement](https://github.com/Mike-U5/rl-plugin-home-improvement/tree/6b7cca56d95d794bae252f5f7b58b8d2d5f6027e) | House building-mode cleanup and Mahogany Homes catalog |
 | [Misclick Guard](https://github.com/willzero123/misclick-guard/tree/a49e33e7576dbf60ec3caa39be4f470b6be71f47) | Button matching, click-origin protection and Cancel fallback |
 | [Ground Loot Icons](https://github.com/Fiffers/ground-loot-icons/tree/8e3e529f27aef3b7a5323ef8fef4f565d8b00be2) | Take-menu item icons and row geometry |
-| [Mouseover Options+](https://github.com/Petzep/mouseover-options/tree/872f6bf6a0817e5d6292749c2f3d4ae8a8eb9600) | Additional-option count concept |
+| [Mouseover Options+](https://github.com/Petzep/mouseover-options/tree/872f6bf6a0817e5d6292749c2f3d4ae8a8eb9600) | Additional-option counts, minimum threshold, Examine/widget switches and text color |
 | [No Use Player](https://github.com/oohwooh/no-use-players/tree/e76b5612cea2f9fe68b0ba6cecd2bf11b1a5d656) | Item-only player-use protection and default allowed items |
 | [Don't Telegrab NPCs](https://github.com/ldavid432/dont-telekinetic-grab-npcs/tree/71b6675364d67a65eb0023667c42863eeb0e3ea7) | Telegrab-specific NPC protection and useful-target catalog |
 
-Users of the features in this table can consolidate them here after checking their settings. This is feature coverage, not a claim that every setting in each source plugin has been reproduced. No Examine's Set-heading removal, Mouseover Options+'s full hover text controls, and Menu Colorizer's configurable default picker color are not included. Cancel/Walk cleanup applies only to opened menus. Useful Telegrab targets are always allowed rather than individually switchable. Hold-to-reveal is shared rather than Examine-only. Mahogany Homes cleanup preserves non-Remove actions.
+Users of the features in this table can consolidate them here after checking their settings. This is feature coverage, not a claim that every setting in each source plugin has been reproduced. Cancel/Walk/Set-heading cleanup applies only to opened menus. Option counts use a standard hover tooltip rather than Mouseover Options+'s custom badge layout. Useful Telegrab targets are always allowed rather than individually switchable. Hold-to-reveal is shared rather than Examine-only. Mahogany Homes cleanup preserves non-Remove actions.
 
 Keep RuneLite's Menu Entry Swapper for swaps and specialist plugins for their remaining features. Disable overlapping filters/colors before comparing results: this plugin cannot reveal options another plugin has removed.
 

@@ -101,7 +101,7 @@ public class ImprovedMenusPlugin extends Plugin
                 SwingUtilities.invokeLater(() -> {
                     if (!active) { return; }
                     String old=engine.color(target,option);
-                    Color color=JColorChooser.showDialog(panel,"Color " + option + " " + target,old == null ? Color.GREEN : new Color(Integer.parseInt(old,16)));
+                    Color color=JColorChooser.showDialog(panel,"Color " + option + " " + target,old == null ? SettingsCatalog.colorOrDefault(config.defaultPickerColor(),Color.GREEN) : new Color(Integer.parseInt(old,16)));
                     if (color != null && active) { saveColor(target,option,String.format("#%06x",color.getRGB() & 0xffffff)); }
                 });
             });

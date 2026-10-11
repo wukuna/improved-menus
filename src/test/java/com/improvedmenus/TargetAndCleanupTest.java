@@ -99,6 +99,17 @@ public class TargetAndCleanupTest
         Menu menu=TestMenus.menu(cancel,walk,talk); engine.apply(menu); assertEquals(3,menu.getMenuEntries().length);
         engine.applyOpened(menu); assertArrayEquals(new MenuEntry[]{talk},menu.getMenuEntries());
     }
+    @Test public void setHeadingFilteringOnlyChangesOpenedMenusAndRespectsReveal()
+    {
+        when(config.hideSetHeading()).thenReturn(true); MenuEntry heading=entry(MenuAction.SET_HEADING,"Set heading"), walk=entry(MenuAction.WALK,"Walk here");
+        Menu menu=TestMenus.menu(heading,walk); engine.apply(menu); assertEquals(2,menu.getMenuEntries().length);
+        engine.applyOpened(menu); assertArrayEquals(new MenuEntry[]{walk},menu.getMenuEntries());
+        when(config.revealKey()).thenReturn(ImprovedMenusConfig.RevealKey.CONTROL); when(client.isKeyPressed(KeyCode.KC_CONTROL)).thenReturn(true);
+        when(client.getCanvas()).thenReturn(new Canvas() { @Override public boolean hasFocus() { return true; } });
+        menu=TestMenus.menu(heading,walk); engine.applyOpened(menu); assertEquals(2,menu.getMenuEntries().length);
+        when(config.hideSetHeading()).thenReturn(false); when(config.revealKey()).thenReturn(ImprovedMenusConfig.RevealKey.NONE);
+        menu=TestMenus.menu(heading,walk); engine.applyOpened(menu); assertEquals(2,menu.getMenuEntries().length);
+    }
     @Test public void cleanupSwitchesAreIndependent()
     {
         when(config.hideCancel()).thenReturn(true); MenuEntry cancel=entry(MenuAction.CANCEL,"Cancel"), walk=entry(MenuAction.WALK,"Walk here");
