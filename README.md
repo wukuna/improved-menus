@@ -13,7 +13,7 @@ Independent RuneLite menu protections, item rules, colors and profiles in one se
 - **House:** hide building actions outside building mode, plus unnecessary Mahogany Homes Remove actions. Other furniture actions stay available.
 - **Buttons:** normal, right-click-only or hidden modes for Auto Retaliate, XP Drops, bank placeholders and Report. Right-click-only checks where the click began; it does not merely move the action down the list.
 - **Presentation:** action colors, wildcard mappings, submenu support, a Shift-menu color picker/reset with configurable default color, optional ground-loot icons and additional-option counts. Counts support a minimum threshold, including/excluding Examine, showing/hiding counts on interface widgets, and a configurable text color.
-- **Shared editor:** search, name/context exceptions, diagnostics showing the before/after entry counts and reasons, named profiles, selective reset, twenty-step undo, and validated import/export previews.
+- **Shared editor:** collapsible sections, search that expands matching sections, name/context exceptions, diagnostics showing the before/after entry counts and reasons, named profiles, selective reset, twenty-step undo, and validated import/export previews. Bank settings remain at the bottom. Reset shown resets only the currently expanded or search-matched settings.
 
 Protection switches start off. Enable the features you want in the sidebar or RuneLite settings. Button modes start at Normal. Hold **Ctrl before opening a menu** to reveal options hidden by this plugin. The reveal modifier can be changed to Shift, Alt or None. It does not consume keys or recreate options removed by another plugin.
 

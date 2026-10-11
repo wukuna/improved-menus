@@ -15,22 +15,24 @@ final class ImprovedMenusPanel extends PluginPanel
     private final JPanel settings = new JPanel();
     private final JTextArea preview = new JTextArea(9,18);
     private final JLabel status = new JLabel(" ");
+    private final Map<String,Boolean> expanded = new HashMap<>();
     private final javax.swing.Timer timer;
 
     ImprovedMenusPanel(ProfileStore store, MenuEngine engine)
     {
         super(false);
         this.store=store; this.engine=engine;
+        expanded.put("General",true); expanded.put("Inventory",true); expanded.put("Menu cleanup",true);
         setLayout(new BorderLayout(0,8));
         JPanel top = new JPanel(); top.setLayout(new BoxLayout(top,BoxLayout.Y_AXIS));
-        top.add(new JLabel("Menu Workshop")); top.add(new JLabel("<html>Enable the features you want.<br>Hold Ctrl before opening to reveal.</html>"));
+        top.add(new JLabel("Menu Workshop")); top.add(new JLabel("<html>Enable the features you want.<br>Hold your reveal key before opening.</html>"));
         top.add(new JLabel("Search settings")); top.add(search);
         JPanel actions = new JPanel(new GridLayout(0,2,4,4));
         button(actions,"Profiles",this::profiles); button(actions,"Import/export",this::imports);
         button(actions,"Undo",() -> { store.undo(); render(); });
         button(actions,"Reset shown",() -> {
             Map<String,String> defaults = new LinkedHashMap<>();
-            for (SettingsCatalog.Setting s : SettingsCatalog.ALL.values()) { if (matches(s)) { defaults.put(s.key,s.defaultValue); } }
+            for (SettingsCatalog.Setting s : SettingsCatalog.ALL.values()) { if (visible(s)) { defaults.put(s.key,s.defaultValue); } }
             store.apply(defaults); render();
         });
         top.add(actions); top.add(status);
@@ -54,15 +56,29 @@ final class ImprovedMenusPanel extends PluginPanel
     void stop() { timer.stop(); }
     private boolean matches(SettingsCatalog.Setting s)
     {
-        return (s.section + " " + s.label).toLowerCase(Locale.ROOT).contains(search.getText().toLowerCase(Locale.ROOT));
+        return (s.section + " " + s.label).toLowerCase(Locale.ROOT).contains(search.getText().trim().toLowerCase(Locale.ROOT));
     }
+    private boolean visible(SettingsCatalog.Setting s)
+    { return matches(s) && (!search.getText().trim().isEmpty() || expanded.getOrDefault(s.section,false)); }
     private void render()
     {
         settings.removeAll(); String lastSection = "";
         for (SettingsCatalog.Setting s : SettingsCatalog.ALL.values())
         {
             if (!matches(s)) { continue; }
-            if (!lastSection.equals(s.section)) { settings.add(new JLabel(s.section)); lastSection=s.section; }
+            if (!lastSection.equals(s.section))
+            {
+                lastSection=s.section; String section=s.section;
+                boolean searching=!search.getText().trim().isEmpty();
+                boolean open=searching || expanded.getOrDefault(section,false);
+                JButton group=new JButton((open ? "▼ " : "▶ ") + section);
+                group.setName("section:" + section); group.setAlignmentX(Component.LEFT_ALIGNMENT);
+                group.setHorizontalAlignment(SwingConstants.LEFT); group.setMaximumSize(new Dimension(Integer.MAX_VALUE,28));
+                group.setEnabled(!searching);
+                group.addActionListener(e -> { expanded.put(section,!expanded.getOrDefault(section,false)); render(); });
+                settings.add(group); settings.add(Box.createVerticalStrut(4));
+            }
+            if (!visible(s)) { continue; }
             JPanel row = new JPanel(); row.setLayout(new BoxLayout(row,BoxLayout.Y_AXIS));
             row.setAlignmentX(Component.LEFT_ALIGNMENT);
             if (s.choices.length == 2 && s.choices[0].equals("false"))
