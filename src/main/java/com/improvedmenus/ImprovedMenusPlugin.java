@@ -20,7 +20,7 @@ import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.ui.overlay.OverlayManager;
 
-@PluginDescriptor(name="Improved Menus", description="Independent menu protections, item rules, colors and profiles", tags={"menu","bank","inventory","misclick","examine","color"})
+@PluginDescriptor(name="Menu Workshop", description="Independent menu protections, item rules, colors and profiles", tags={"menu","bank","inventory","misclick","examine","color"})
 public class ImprovedMenusPlugin extends Plugin
 {
     @Inject private Client client;
@@ -49,7 +49,7 @@ public class ImprovedMenusPlugin extends Plugin
         SwingUtilities.invokeLater(() -> {
             if (!active) { return; }
             panel=new ImprovedMenusPanel(store,engine);
-            navigation=NavigationButton.builder().tooltip("Improved Menus").icon(icon()).priority(6).panel(panel).build();
+            navigation=NavigationButton.builder().tooltip("Menu Workshop").icon(icon()).priority(6).panel(panel).build();
             toolbar.addNavigation(navigation);
         });
     }

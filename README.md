@@ -1,4 +1,4 @@
-# Improved Menus
+# Menu Workshop
 
 Independent RuneLite menu protections, item rules, colors and profiles in one searchable panel.
 

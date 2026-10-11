@@ -7,7 +7,7 @@ public interface ImprovedMenusConfig extends Config
 {
     String GROUP = "improvedmenus";
     enum RevealKey { CONTROL, SHIFT, ALT, NONE }
-    @ConfigItem(keyName="revealKey", name="Hold to reveal", description="Hold before opening a menu to reveal options hidden by Improved Menus", position=0)
+    @ConfigItem(keyName="revealKey", name="Hold to reveal", description="Hold before opening a menu to reveal options hidden by Menu Workshop", position=0)
     default RevealKey revealKey() { return RevealKey.CONTROL; }
     @ConfigItem(keyName="potionEmpty", name="Protect potion Empty", description="Hide Empty on dosed inventory potions", position=1)
     default boolean potionEmpty() { return false; }

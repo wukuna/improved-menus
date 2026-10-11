@@ -23,7 +23,7 @@ final class ImprovedMenusPanel extends PluginPanel
         this.store=store; this.engine=engine;
         setLayout(new BorderLayout(0,8));
         JPanel top = new JPanel(); top.setLayout(new BoxLayout(top,BoxLayout.Y_AXIS));
-        top.add(new JLabel("Improved Menus")); top.add(new JLabel("<html>Enable the features you want.<br>Hold Ctrl before opening to reveal.</html>"));
+        top.add(new JLabel("Menu Workshop")); top.add(new JLabel("<html>Enable the features you want.<br>Hold Ctrl before opening to reveal.</html>"));
         top.add(new JLabel("Search settings")); top.add(search);
         JPanel actions = new JPanel(new GridLayout(0,2,4,4));
         button(actions,"Profiles",this::profiles); button(actions,"Import/export",this::imports);
@@ -104,7 +104,7 @@ final class ImprovedMenusPanel extends PluginPanel
     private void run(Runnable action)
     {
         try { action.run(); status.setText("Saved"); }
-        catch (IllegalArgumentException e) { status.setText("Check settings"); JOptionPane.showMessageDialog(this,e.getMessage(),"Improved Menus",JOptionPane.ERROR_MESSAGE); }
+        catch (IllegalArgumentException e) { status.setText("Check settings"); JOptionPane.showMessageDialog(this,e.getMessage(),"Menu Workshop",JOptionPane.ERROR_MESSAGE); }
     }
     private void profiles()
     {
