@@ -1,6 +1,6 @@
 # Menu Workshop
 
-Independent RuneLite menu protections, item rules, colors and profiles in one searchable panel.
+Independent RuneLite menu protections, item rules and colors, with grouped settings and profile tools.
 
 ## Features
 
@@ -13,9 +13,10 @@ Independent RuneLite menu protections, item rules, colors and profiles in one se
 - **House:** hide building actions outside building mode, plus unnecessary Mahogany Homes Remove actions. Other furniture actions stay available.
 - **Buttons:** normal, right-click-only or hidden modes for Auto Retaliate, XP Drops, bank placeholders and Report. Right-click-only checks where the click began; it does not merely move the action down the list.
 - **Presentation:** action colors, wildcard mappings, submenu support, a Shift-menu color picker/reset with configurable default color, optional ground-loot icons and additional-option counts. Counts support a minimum threshold, including/excluding Examine, showing/hiding counts on interface widgets, and a configurable text color.
-- **Shared editor:** collapsible sections, search that expands matching sections, name/context exceptions, diagnostics showing the before/after entry counts and reasons, named profiles, selective reset, twenty-step undo, and validated import/export previews. Bank settings remain at the bottom. Reset shown resets only the currently expanded or search-matched settings.
+- **Settings:** configure every feature in RuneLite's normal Menu Workshop settings, grouped into collapsible sections. **Hide options** groups Walk here, Cancel, Set heading, Use on Player, Telegrab NPCs, potion Empty and Examine controls. Bank stays last.
+- **Side panel tools:** named profiles, twenty-step undo, validated import/export previews, and diagnostics showing the before/after entry counts and reasons. Settings are not duplicated in the side panel. Undo covers profile/import/editor changes; ordinary RuneLite settings use RuneLite's normal controls.
 
-Protection switches start off. Enable the features you want in the sidebar or RuneLite settings. Button modes start at Normal. Hold **Ctrl before opening a menu** to reveal options hidden by this plugin. The reveal modifier can be changed to Shift, Alt or None. It does not consume keys or recreate options removed by another plugin.
+Protection switches start off. Enable the features you want in RuneLite's Menu Workshop settings. Button modes start at Normal. Hold **Ctrl before opening a menu** to reveal options hidden by this plugin. The reveal modifier can be changed to Shift, Alt or None. It does not consume keys or recreate options removed by another plugin.
 
 ## Item rules and exceptions
 
@@ -44,7 +45,7 @@ Menu colors use `target:action:#RRGGBB`, separated by semicolons:
 
 Exact color mappings take precedence over wildcard mappings. Hold Shift when opening a menu to use the local color editor. Reset removes that entry's exact mapping; a broader wildcard can still apply.
 
-**Default picker color** applies when an entry has no matching color mapping. **Option count text color** changes the hover count. Both colors use `#RRGGBB` in RuneLite settings, with color pickers in the sidebar. **Minimum extra options** accepts 1–500. Counts exclude Cancel, Walk here and local editor actions; **Count Examine** and **Show count on interface widgets** control the remaining categories. These settings are included in profiles, undo and imports.
+**Default picker color** applies when an entry has no matching color mapping. **Option count text color** changes the hover count. Both colors use `#RRGGBB` in RuneLite settings. The Shift menu color editor provides an interactive picker for menu entries. **Minimum extra options** accepts 1–500. Counts exclude Cancel, Walk here and local editor actions; **Count Examine** and **Show count on interface widgets** control the remaining categories. These settings are included in profiles, undo and imports.
 
 The editor accepts at most 200 rules per field. Invalid manual configuration edits disable that rule field rather than retaining old invisible rules. Profile imports validate every setting before applying changes. Imports cannot modify other plugins' settings. Existing-setting import reads explicitly saved settings from the supported plugins listed below and leaves those originals intact. Missing settings and source-plugin enablement are not inferred.
 

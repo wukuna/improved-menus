@@ -15,7 +15,7 @@ import static org.mockito.Mockito.*;
 
 public class PanelTest
 {
-    @Test public void editorRendersAndCanStopItsTimer() throws Exception
+    @Test public void sidePanelOffersToolsWithoutDuplicateSettings() throws Exception
     {
         Client client=mock(Client.class); ImprovedMenusConfig config=mock(ImprovedMenusConfig.class); ConfigManager manager=mock(ConfigManager.class);
         Injector injector=Guice.createInjector(new AbstractModule() { protected void configure() {
@@ -23,29 +23,21 @@ public class PanelTest
         } });
         SwingUtilities.invokeAndWait(() -> {
             ImprovedMenusPanel panel=new ImprovedMenusPanel(injector.getInstance(ProfileStore.class),injector.getInstance(MenuEngine.class));
-            java.util.List<JButton> groups=components(panel,JButton.class);
-            groups.removeIf(b -> b.getName()==null || !b.getName().startsWith("section:"));
-            assertEquals("section:Bank",groups.get(groups.size()-1).getName());
-            JButton colors=groups.stream().filter(b -> b.getName().equals("section:Colors")).findFirst().get();
-            assertTrue(colors.getText().startsWith("▶"));
-            colors.doClick();
-            assertTrue(components(panel,JButton.class).stream().anyMatch(b -> "Default picker color".equals(b.getText())));
-            JTextField search=components(panel,JTextField.class).get(0);
-            search.setText("minimum");
-            assertEquals(1,components(panel,JSpinner.class).size());
-            assertTrue(components(panel,JButton.class).stream().filter(b -> "section:Presentation".equals(b.getName())).allMatch(b -> !b.isEnabled()));
-            search.setText("");
+            assertEquals(0,components(panel,JCheckBox.class).size());
+            assertEquals(0,components(panel,JTextField.class).size());
             assertEquals(0,components(panel,JSpinner.class).size());
-            assertTrue(components(panel,JButton.class).stream().anyMatch(b -> "Default picker color".equals(b.getText())));
-            search.setText("minimum");
-            components(panel,JButton.class).stream().filter(b -> "Reset shown".equals(b.getText())).findFirst().get().doClick();
-            verify(manager).setConfiguration("improvedmenus","minimumOptions","1");
-            verify(manager,never()).setConfiguration(eq("improvedmenus"),eq("defaultPickerColor"),anyString());
-            search.setText("");
+            assertEquals(3,components(panel,JButton.class).stream().filter(b -> java.util.Arrays.asList("Profiles","Import/export","Undo").contains(b.getText())).count());
+            verifyNoInteractions(manager);
+            ProfileStore store=injector.getInstance(ProfileStore.class);
+            store.apply(java.util.Collections.singletonMap("potionEmpty","true"));
+            clearInvocations(manager);
+            components(panel,JButton.class).stream().filter(b -> "Undo".equals(b.getText())).findFirst().get().doClick();
+            verify(manager).setConfiguration("improvedmenus","potionEmpty","false");
+            assertTrue(components(panel,JLabel.class).stream().anyMatch(label -> "Undone".equals(label.getText())));
             panel.setSize(225,850); layout(panel);
             BufferedImage image=new BufferedImage(225,850,BufferedImage.TYPE_INT_RGB); Graphics2D g=image.createGraphics(); panel.printAll(g); g.dispose();
             try { ImageIO.write(image,"png",new File("build/ui-preview.png")); } catch (java.io.IOException e) { throw new AssertionError(e); }
-            assertTrue(panel.getComponentCount() >= 3); panel.stop();
+            assertEquals(2,panel.getComponentCount()); panel.stop();
         });
     }
     private static void layout(Container container) { container.doLayout(); for (Component c : container.getComponents()) { if (c instanceof Container) { layout((Container)c); } } }
