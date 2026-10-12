@@ -28,6 +28,8 @@ public interface ImprovedMenusConfig extends Config
     enum RevealKey { CONTROL, SHIFT, ALT, NONE }
     @ConfigItem(keyName="revealKey", name="Hold to reveal", description="Hold before opening a menu to reveal options hidden by Menu Workshop", position=0, section=generalSection)
     default RevealKey revealKey() { return RevealKey.CONTROL; }
+    @ConfigItem(keyName="hideSidePanel", name="Hide side panel", description="Hide the Menu Workshop toolbar button; configure all features in RuneLite settings", position=1, section=generalSection)
+    default boolean hideSidePanel() { return false; }
     @ConfigItem(keyName="potionEmpty", name="No Empty on potions", description="Hide Empty on dosed inventory potions", position=7, section=hideOptionsSection)
     default boolean potionEmpty() { return false; }
     @ConfigItem(keyName="bankWield", name="Bank: hide Wield", description="Hide inventory Wield while the bank is open", position=35, section=bankSection)
@@ -58,6 +60,8 @@ public interface ImprovedMenusConfig extends Config
     default String colors() { return ""; }
     @ConfigItem(keyName="enableColors", name="Enable colors", description="Color supported menu options, including submenus", position=15, section=colorsSection)
     default boolean enableColors() { return true; }
+    @ConfigItem(keyName="yellowHover", name="Yellow hover highlight", description="Use the native yellow highlight when hovering over a colored menu option", position=17, section=colorsSection)
+    default boolean yellowHover() { return true; }
     @ConfigItem(keyName="colorPicker", name="Shift menu color editor", description="Hold Shift and open a menu to add local color controls", position=16, section=colorsSection)
     default boolean colorPicker() { return true; }
     @ConfigItem(keyName="chop", name="Require axe", description="Hide tree Chop/Cut when no axe is carried or equipped", position=17, section=toolsSection)

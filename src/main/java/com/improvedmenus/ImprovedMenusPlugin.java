@@ -46,12 +46,7 @@ public class ImprovedMenusPlugin extends Plugin
         active=true;
         clientThread.invokeLater(() -> { if (active) { engine.reload(); } });
         buttons.startUp(); eventBus.register(buttons); overlays.add(presentation); presentation.start();
-        SwingUtilities.invokeLater(() -> {
-            if (!active) { return; }
-            panel=new ImprovedMenusPanel(store,engine);
-            navigation=NavigationButton.builder().tooltip("Menu Workshop").icon(icon()).priority(6).panel(panel).build();
-            toolbar.addNavigation(navigation);
-        });
+        SwingUtilities.invokeLater(this::updateSidePanel);
     }
     @Override protected void shutDown()
     {
@@ -75,7 +70,26 @@ public class ImprovedMenusPlugin extends Plugin
     @Subscribe public void onConfigChanged(ConfigChanged event)
     {
         if (ImprovedMenusConfig.GROUP.equals(event.getGroup()))
-        { clientThread.invokeLater(() -> { if (active) { if (!config.groundIcons()) { presentation.stop(); } engine.reload(); } }); }
+        {
+            clientThread.invokeLater(() -> { if (active) { if (!config.groundIcons()) { presentation.stop(); } engine.reload(); } });
+            if (event.getKey().equals("hideSidePanel")) { SwingUtilities.invokeLater(this::updateSidePanel); }
+        }
+    }
+    @Subscribe public void onBeforeMenuRender(BeforeMenuRender event)
+    { if (active && client.isMenuOpen()) { engine.highlightHovered(client.getMenu()); } }
+    private void updateSidePanel()
+    {
+        if (!active || config.hideSidePanel())
+        {
+            if (navigation != null) { toolbar.removeNavigation(navigation); navigation=null; }
+            if (panel != null) { panel.stop(); panel=null; }
+        }
+        else if (navigation == null)
+        {
+            panel=new ImprovedMenusPanel(store,engine);
+            navigation=NavigationButton.builder().tooltip("Menu Workshop").icon(icon()).priority(6).panel(panel).build();
+            toolbar.addNavigation(navigation);
+        }
     }
     @Subscribe public void onGameStateChanged(GameStateChanged event)
     {

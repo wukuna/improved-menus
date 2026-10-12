@@ -56,6 +56,48 @@ final class MenuEngine
         });
         ownedColors.clear();
     }
+    void highlightHovered(Menu menu)
+    {
+        // Release the previous hover before finding this frame's row. Only change
+        // entries whose identity and text still match our own decoration.
+        ownedColors.forEach((entry,edit) -> {
+            if (edit.matches(entry)) { entry.setOption(edit.colored); edit.after=edit.colored; }
+        });
+        if (!config.enableColors() || !config.yellowHover() || menu == null) { return; }
+        MenuEntry hovered=hovered(menu,0,true);
+        ColorEdit edit=ownedColors.get(hovered);
+        if (edit != null && edit.matches(hovered))
+        {
+            // Native rendering supplies yellow. Keep image tags and target colors.
+            edit.after=edit.colored.replaceAll("</?col(?:=[^>]*)?>", "");
+            hovered.setOption(edit.after);
+        }
+    }
+    private MenuEntry hovered(Menu menu,int depth,boolean root)
+    {
+        if (depth > 8 || menu.getMenuWidth() <= 0 || menu.getMenuHeight() <= 0) { return null; }
+        MenuEntry[] entries=menu.getMenuEntries();
+        // A submenu can be outside its parent's rectangle. Prefer the deepest row.
+        for (MenuEntry entry : entries)
+        {
+            if (entry.getSubMenu() != null)
+            {
+                MenuEntry child=hovered(entry.getSubMenu(),depth+1,false);
+                if (child != null) { return child; }
+            }
+        }
+        Point mouse=client.getMouseCanvasPosition();
+        int x=mouse.getX(), y=mouse.getY();
+        if (x <= menu.getMenuX() || x >= menu.getMenuX()+menu.getMenuWidth()
+            || y <= menu.getMenuY()+18 || y >= menu.getMenuY()+menu.getMenuHeight()) { return null; }
+        int scroll=root && client.isMenuScrollable() ? client.getMenuScroll() : 0;
+        for (int i=0;i<entries.length;i++)
+        {
+            int baseline=menu.getMenuY()+31+(entries.length-1-i-scroll)*15;
+            if (y > baseline-13 && y < baseline+3) { return entries[i]; }
+        }
+        return null;
+    }
 
     void apply(Menu menu)
     { apply(menu,true); }
@@ -271,10 +313,14 @@ final class MenuEngine
     static final class Context { boolean bank, toolsKnown, axe, pick, house, building; }
     private static final class ColorEdit
     {
-        final String before, after, target;
+        final String before, colored, target;
+        String after;
         final MenuAction type;
         final int identifier;
         ColorEdit(String before,String after,MenuEntry entry)
-        { this.before=before; this.after=after; target=MenuRules.plain(entry.getTarget()); type=entry.getType(); identifier=entry.getIdentifier(); }
+        { this.before=before; this.after=after; this.colored=after; target=MenuRules.plain(entry.getTarget()); type=entry.getType(); identifier=entry.getIdentifier(); }
+        boolean matches(MenuEntry entry)
+        { return entry.getOption().equals(after) && MenuRules.plain(entry.getTarget()).equals(target)
+            && entry.getType() == type && entry.getIdentifier() == identifier; }
     }
 }

@@ -22,6 +22,13 @@ public class ProfileStoreTest
     }
     @Test public void roundTripProfiles()
     { Map<String,String> initial=store.snapshot(); assertEquals(initial,store.previewImport(store.exportSettings(initial))); }
+    @Test public void hoverAndSidebarSettingsRoundTripAndUndo()
+    {
+        Map<String,String> settings=new LinkedHashMap<>(); settings.put("hideSidePanel","true"); settings.put("yellowHover","false");
+        store.apply(store.previewImport(store.exportSettings(settings)));
+        assertEquals("true",store.snapshot().get("hideSidePanel")); assertEquals("false",store.snapshot().get("yellowHover"));
+        assertTrue(store.undo()); assertEquals("false",store.snapshot().get("hideSidePanel")); assertEquals("true",store.snapshot().get("yellowHover"));
+    }
     @Test public void importPreviewDoesNotWrite()
     { store.previewImport("{\"version\":1,\"settings\":{\"bankEat\":\"true\"}}"); assertTrue(values.isEmpty()); }
     @Test public void applyAndUndo()

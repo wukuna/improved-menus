@@ -18,6 +18,8 @@ Independent RuneLite menu protections, item rules and colors, with grouped setti
 
 Protection switches start off. Enable the features you want in RuneLite's Menu Workshop settings. Button modes start at Normal. Hold **Ctrl before opening a menu** to reveal options hidden by this plugin. The reveal modifier can be changed to Shift, Alt or None. It does not consume keys or recreate options removed by another plugin.
 
+Enable **Hide side panel** under General to remove the Menu Workshop toolbar button. Menu features and the Shift-menu color editor remain active. Turn it off to access profiles, import/export, undo and diagnostics again.
+
 ## Item rules and exceptions
 
 Use one `action,item name` rule per line. Matching ignores case and formatting tags. `*` matches any text; other characters are literal. Lines starting with `#` are comments.
@@ -44,6 +46,8 @@ Menu colors use `target:action:#RRGGBB`, separated by semicolons:
 ```
 
 Exact color mappings take precedence over wildcard mappings. Hold Shift when opening a menu to use the local color editor. Reset removes that entry's exact mapping; a broader wildcard can still apply.
+
+**Yellow hover highlight** is enabled by default: a colored menu option uses the native yellow highlight while hovered, then returns to its configured color. Disable it to retain the configured color on hover. Item/name colors and image tags are preserved.
 
 **Default picker color** applies when an entry has no matching color mapping. **Option count text color** changes the hover count. Both colors use `#RRGGBB` in RuneLite settings. The Shift menu color editor provides an interactive picker for menu entries. **Minimum extra options** accepts 1–500. Counts exclude Cancel, Walk here and local editor actions; **Count Examine** and **Show count on interface widgets** control the remaining categories. These settings are included in profiles, undo and imports.
 

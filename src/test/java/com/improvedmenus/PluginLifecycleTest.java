@@ -7,6 +7,7 @@ import net.runelite.api.Client;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.EventBus;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.game.ChatIconManager;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.input.MouseManager;
@@ -40,5 +41,21 @@ public class PluginLifecycleTest
         verify(overlays,times(2)).add(any(MenuPresentation.class)); verify(overlays,times(2)).remove(any(MenuPresentation.class));
         verify(toolbar,times(2)).addNavigation(any(NavigationButton.class)); verify(toolbar,times(2)).removeNavigation(any(NavigationButton.class));
         verify(icons,times(1)).registerChatIcon(any());
+        when(config.hideSidePanel()).thenReturn(true);
+        plugin.startUp(); SwingUtilities.invokeAndWait(() -> {});
+        verify(toolbar,times(2)).addNavigation(any(NavigationButton.class));
+        ConfigChanged changed=new ConfigChanged(); changed.setGroup(ImprovedMenusConfig.GROUP); changed.setKey("hideSidePanel");
+        when(config.hideSidePanel()).thenReturn(false);
+        plugin.onConfigChanged(changed); plugin.onConfigChanged(changed); SwingUtilities.invokeAndWait(() -> {});
+        verify(toolbar,times(3)).addNavigation(any(NavigationButton.class));
+        when(config.hideSidePanel()).thenReturn(true);
+        plugin.onConfigChanged(changed); SwingUtilities.invokeAndWait(() -> {});
+        verify(toolbar,times(3)).removeNavigation(any(NavigationButton.class));
+        // Hiding the toolbar must not disable menu guards or presentation.
+        verify(bus,times(2)).unregister(any(ButtonGuard.class)); verify(overlays,times(2)).remove(any(MenuPresentation.class));
+        when(config.hideSidePanel()).thenReturn(false);
+        plugin.onConfigChanged(changed); plugin.shutDown(); SwingUtilities.invokeAndWait(() -> {});
+        verify(toolbar,times(3)).addNavigation(any(NavigationButton.class));
+        verify(bus,times(3)).unregister(any(ButtonGuard.class));
     }
 }
