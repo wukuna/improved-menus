@@ -27,7 +27,7 @@ final class MenuPresentation extends Overlay
     @Inject private ChatIconManager icons;
     @Inject private TooltipManager tooltips;
     private int placeholder = -1;
-    private final IdentityHashMap<MenuEntry,String> ownedTargets = new IdentityHashMap<>();
+    private final IdentityHashMap<MenuEntry,TargetEdit> ownedTargets = new IdentityHashMap<>();
     private String marker = "";
 
     MenuPresentation() { setPosition(OverlayPosition.DYNAMIC); setLayer(OverlayLayer.ALWAYS_ON_TOP); }
@@ -39,27 +39,26 @@ final class MenuPresentation extends Overlay
     void stop()
     {
         // Restore a decorated open menu; do not modify entries remapped since it was built.
-        ownedTargets.forEach((entry,original) -> { if (entry.getTarget().equals(marker + original)) { entry.setTarget(original); } });
+        ownedTargets.forEach((entry,edit) -> { if (edit.matches(entry)) { entry.setTarget(edit.original); } });
         ownedTargets.clear();
     }
     void decorate(Menu menu)
     {
-        ownedTargets.clear();
+        stop();
         if (!config.groundIcons()) { return; }
         int index=icons.chatIconIndex(placeholder); if (index == -1) { return; }
         marker="<img=" + index + ">";
-        decorate(menu,0);
-    }
-    private void decorate(Menu menu,int depth)
-    {
-        if (depth > 8) { return; }
+        // Submenu bounds are not valid unless open, and the API does not expose
+        // that state. Keep submenu text native rather than reserving blank icons.
+        if (menu == null) { return; }
         for (MenuEntry entry : menu.getMenuEntries())
         {
-            if (entry.getSubMenu() != null) { decorate(entry.getSubMenu(),depth+1); }
             if (GROUND.contains(entry.getType()) && "Take".equals(MenuRules.plain(entry.getOption())))
             {
                 String original=entry.getTarget();
-                if (!original.startsWith(marker)) { ownedTargets.put(entry,original); entry.setTarget(marker+original); }
+                String decorated = marker + original;
+                ownedTargets.put(entry,new TargetEdit(entry,original,decorated));
+                entry.setTarget(decorated);
             }
         }
     }
@@ -67,7 +66,7 @@ final class MenuPresentation extends Overlay
     {
         if (client.isMenuOpen())
         {
-            if (config.groundIcons()) { draw(graphics,client.getMenu(),0,true); }
+            if (config.groundIcons()) { draw(graphics,client.getMenu()); }
         }
         else if (config.optionCount())
         {
@@ -97,21 +96,36 @@ final class MenuPresentation extends Overlay
         }
         return Math.max(0,count-1);
     }
-    private void draw(Graphics2D g,Menu menu,int depth,boolean root)
+    private void draw(Graphics2D g,Menu menu)
     {
-        if (depth > 8 || menu.getMenuWidth() <= 0 || menu.getMenuHeight() <= 0) { return; }
+        if (menu == null || menu.getMenuWidth() <= 0 || menu.getMenuHeight() <= 0) { return; }
         MenuEntry[] entries=menu.getMenuEntries();
-        int scroll=root && client.isMenuScrollable() ? client.getMenuScroll() : 0;
+        int scroll=client.isMenuScrollable() ? client.getMenuScroll() : 0;
         FontMetrics metrics=g.getFontMetrics(FontManager.getRunescapeFont());
         for (int i=0;i<entries.length;i++)
         {
             MenuEntry entry=entries[i];
-            if (entry.getSubMenu() != null) { draw(g,entry.getSubMenu(),depth+1,false); }
             if (!GROUND.contains(entry.getType()) || !"Take".equals(MenuRules.plain(entry.getOption())) || !entry.getTarget().startsWith(marker)) { continue; }
             int y=menu.getMenuY()+19+(entries.length-1-i-scroll)*15;
             if (y < menu.getMenuY()+19 || y+15 > menu.getMenuY()+menu.getMenuHeight()) { continue; }
             int x=menu.getMenuX()+8+metrics.stringWidth(MenuRules.plain(entry.getOption())+" ");
             g.drawImage(items.getImage(entry.getIdentifier(),Integer.MAX_VALUE,false),x,y,17,15,null);
+        }
+    }
+    private static final class TargetEdit
+    {
+        final String original, decorated;
+        final MenuAction type;
+        final int identifier, param0, param1;
+        TargetEdit(MenuEntry entry,String original,String decorated)
+        {
+            this.original=original; this.decorated=decorated; type=entry.getType();
+            identifier=entry.getIdentifier(); param0=entry.getParam0(); param1=entry.getParam1();
+        }
+        boolean matches(MenuEntry entry)
+        {
+            return entry.getTarget().equals(decorated) && entry.getType()==type
+                && entry.getIdentifier()==identifier && entry.getParam0()==param0 && entry.getParam1()==param1;
         }
     }
 }
