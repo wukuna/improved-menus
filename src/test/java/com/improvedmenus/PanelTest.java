@@ -18,6 +18,9 @@ public class PanelTest
     @Test public void sidePanelOffersToolsWithoutDuplicateSettings() throws Exception
     {
         Client client=mock(Client.class); ImprovedMenusConfig config=mock(ImprovedMenusConfig.class); ConfigManager manager=mock(ConfigManager.class);
+        java.util.Map<String,String> values=new java.util.HashMap<>();
+        when(manager.getConfiguration(anyString(),anyString())).thenAnswer(i -> values.get(i.getArgument(0)+"/"+i.getArgument(1)));
+        doAnswer(i -> { values.put(i.getArgument(0)+"/"+i.getArgument(1),i.getArgument(2).toString()); return null; }).when(manager).setConfiguration(anyString(),anyString(),any());
         Injector injector=Guice.createInjector(new AbstractModule() { protected void configure() {
             bind(net.runelite.client.game.ItemManager.class).toInstance(mock(net.runelite.client.game.ItemManager.class)); bind(Client.class).toInstance(client); bind(ImprovedMenusConfig.class).toInstance(config); bind(ConfigManager.class).toInstance(manager); bind(Gson.class).toInstance(new Gson());
         } });

@@ -64,7 +64,7 @@ final class MenuEngine
             if (edit.matches(entry)) { entry.setOption(edit.colored); edit.after=edit.colored; }
         });
         if (!config.enableColors() || !config.yellowHover() || menu == null) { return; }
-        MenuEntry hovered=hovered(menu,0,true);
+        MenuEntry hovered=hovered(menu);
         ColorEdit edit=ownedColors.get(hovered);
         if (edit != null && edit.matches(hovered))
         {
@@ -73,24 +73,17 @@ final class MenuEngine
             hovered.setOption(edit.after);
         }
     }
-    private MenuEntry hovered(Menu menu,int depth,boolean root)
+    private MenuEntry hovered(Menu menu)
     {
-        if (depth > 8 || menu.getMenuWidth() <= 0 || menu.getMenuHeight() <= 0) { return null; }
+        if (menu.getMenuWidth() <= 0 || menu.getMenuHeight() <= 0) { return null; }
         MenuEntry[] entries=menu.getMenuEntries();
-        // A submenu can be outside its parent's rectangle. Prefer the deepest row.
-        for (MenuEntry entry : entries)
-        {
-            if (entry.getSubMenu() != null)
-            {
-                MenuEntry child=hovered(entry.getSubMenu(),depth+1,false);
-                if (child != null) { return child; }
-            }
-        }
+        // Public Menu bounds are valid only while open. The API does not expose
+        // which submenu is open, so never use cached child bounds for hit testing.
         Point mouse=client.getMouseCanvasPosition();
         int x=mouse.getX(), y=mouse.getY();
         if (x <= menu.getMenuX() || x >= menu.getMenuX()+menu.getMenuWidth()
             || y <= menu.getMenuY()+18 || y >= menu.getMenuY()+menu.getMenuHeight()) { return null; }
-        int scroll=root && client.isMenuScrollable() ? client.getMenuScroll() : 0;
+        int scroll=client.isMenuScrollable() ? client.getMenuScroll() : 0;
         for (int i=0;i<entries.length;i++)
         {
             int baseline=menu.getMenuY()+31+(entries.length-1-i-scroll)*15;

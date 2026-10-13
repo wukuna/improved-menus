@@ -99,14 +99,31 @@ public class RevealAndRestorationTest
         when(client.getMouseCanvasPosition()).thenReturn(new Point(120,211)); engine.highlightHovered(menu);
         assertTrue(lower.getOption().contains("ff0000"));
     }
-    @Test public void hoveredSubmenuCanBeOutsideRootAndRetainsCallbacks()
+    @Test public void staleSubmenuBoundsCannotStealRootHover()
+    {
+        MenuEntry child=TestMenus.entry("Use","Sword",MenuAction.CC_OP,1,InterfaceID.INVENTORY);
+        Menu submenu=hoveredMenu(child);
+        MenuEntry parent=TestMenus.entry("Use","Sword",MenuAction.CC_OP,2,InterfaceID.INVENTORY);
+        when(parent.getSubMenu()).thenReturn(submenu);
+        Menu menu=hoveredMenu(parent);
+        engine.applyOpened(menu); String childColor=child.getOption();
+        engine.highlightHovered(menu);
+        assertEquals("Use",parent.getOption()); assertEquals(childColor,child.getOption());
+        verify(submenu,never()).getMenuX(); verify(submenu,never()).getMenuWidth();
+        verify(child,never()).onClick(any()); verify(child,never()).setType(any());
+        when(client.getMouseCanvasPosition()).thenReturn(new Point(90,231));
+        engine.highlightHovered(menu); assertTrue(parent.getOption().contains("ff0000"));
+        engine.clear(); assertEquals("Use",parent.getOption()); assertEquals("Use",child.getOption());
+    }
+    @Test public void submenuOutsideRootKeepsItsColorWithoutReadingStaleBounds()
     {
         MenuEntry child=TestMenus.entry("Use","Sword",MenuAction.CC_OP,1,InterfaceID.INVENTORY);
         Menu submenu=hoveredMenu(child); when(submenu.getMenuX()).thenReturn(350);
-        MenuEntry parent=TestMenus.entry("Actions","Sword",MenuAction.CC_OP,1,InterfaceID.INVENTORY);
+        MenuEntry parent=TestMenus.entry("Actions","Sword",MenuAction.CC_OP,2,InterfaceID.INVENTORY);
         when(parent.getSubMenu()).thenReturn(submenu);
         Menu menu=hoveredMenu(parent); when(client.getMouseCanvasPosition()).thenReturn(new Point(370,231));
-        engine.applyOpened(menu); engine.highlightHovered(menu); assertEquals("Use",child.getOption());
-        verify(child,never()).onClick(any()); verify(child,never()).setType(any());
+        engine.applyOpened(menu); String colored=child.getOption(); engine.highlightHovered(menu);
+        assertEquals(colored,child.getOption()); verify(submenu,never()).getMenuX();
+        engine.reload(); assertEquals("Use",child.getOption());
     }
 }

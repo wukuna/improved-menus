@@ -110,4 +110,54 @@ public class ProfileStoreTest
             try { store.apply(Collections.singletonMap(key,"<img=3>")); fail(); } catch (IllegalArgumentException expected) { assertTrue(values.isEmpty()); }
         }
     }
+    @Test public void undoLeavesUnrelatedManualChangesAlone()
+    {
+        store.apply(Collections.singletonMap("bankEat","true"));
+        values.put("improvedmenus/bankWield","true");
+        assertTrue(store.undo());
+        assertEquals("false",store.snapshot().get("bankEat"));
+        assertEquals("true",store.snapshot().get("bankWield"));
+    }
+    @Test public void undoPreservesLaterChangesToAnEditedSetting()
+    {
+        store.apply(Collections.singletonMap("colors","Sword:Use:#ff0000"));
+        values.put("improvedmenus/colors","Sword:Use:#0000ff");
+        assertTrue(store.undo());
+        assertEquals("Sword:Use:#0000ff",store.snapshot().get("colors"));
+    }
+    @Test public void undoOfPartialImportAndSuccessiveEditsIsScoped()
+    {
+        store.apply(Collections.singletonMap("bankEat","true"));
+        Map<String,String> settings=new LinkedHashMap<>();
+        settings.put("bankEat","false"); settings.put("bankWield","true");
+        store.apply(store.previewImport(store.exportSettings(settings)));
+        values.put("improvedmenus/hideSidePanel","true");
+        assertTrue(store.undo()); assertEquals("true",store.snapshot().get("bankEat"));
+        assertEquals("false",store.snapshot().get("bankWield"));
+        assertTrue(store.undo()); assertEquals("false",store.snapshot().get("bankEat"));
+        assertEquals("true",store.snapshot().get("hideSidePanel"));
+        assertFalse(store.undo());
+    }
+    @Test public void unchangedSettingsDoNotConsumeUndoHistory()
+    {
+        store.apply(Collections.singletonMap("bankEat","true"));
+        store.apply(Collections.singletonMap("bankEat","true"));
+        store.apply(Collections.emptyMap());
+        assertTrue(store.undo()); assertEquals("false",store.snapshot().get("bankEat"));
+        assertFalse(store.undo());
+    }
+    @Test public void malformedProfileShapesAreFriendlyAndDoNotWrite()
+    {
+        String[] invalid={"null","[]","1","{\"version\":null,\"settings\":{}}",
+            "{\"version\":[],\"settings\":{}}","{\"version\":{},\"settings\":{}}",
+            "{\"version\":\"1\",\"settings\":{}}","{\"version\":1.5,\"settings\":{}}",
+            "{\"version\":true,\"settings\":{}}","{\"version\":1,\"settings\":null}",
+            "{\"version\":1,\"settings\":[]}","{\"version\":1,\"settings\":{\"bankEat\":null}}"};
+        for (String json : invalid)
+        {
+            try { store.previewImport(json); fail("Accepted " + json); }
+            catch (IllegalArgumentException expected) { assertNotNull(expected.getMessage()); }
+            assertTrue(values.isEmpty()); assertFalse(store.undo());
+        }
+    }
 }
