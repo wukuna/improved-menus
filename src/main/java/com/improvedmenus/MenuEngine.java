@@ -226,12 +226,15 @@ final class MenuEngine
             && !(config.keepLoneNpc() && loneExamine(entry, siblings))) { return "NPC Examine"; }
         if (type == MenuAction.EXAMINE_OBJECT && config.examineObject()
             && !(config.keepLoneObject() && loneExamine(entry, siblings))) { return "object Examine"; }
+        // Temple Trekking swamp vines use a knife, and quest cave entrances may start dialogue.
         if (type == MenuAction.GAME_OBJECT_FIRST_OPTION && c.toolsKnown)
         {
             if (config.chop() && !c.axe
+                && entry.getIdentifier() != net.runelite.api.gameval.ObjectID.TEMPLETREK_SWAMPTREE_SMALL_VINES
                 && (option.startsWith("Chop") && (target.contains("ree") || ToolCatalog.CHOP.contains(target))
                 || option.startsWith("Cut") && (target.contains("ree") || target.equals("Sulliuscep")))) { return "axe required"; }
-            if (config.mine() && !c.pick && option.equals("Mine")) { return "pickaxe required"; }
+            if (config.mine() && !c.pick && option.equals("Mine")
+                && !target.equalsIgnoreCase("Cave entrance")) { return "pickaxe required"; }
         }
         if (OBJECTS.contains(type))
         {
