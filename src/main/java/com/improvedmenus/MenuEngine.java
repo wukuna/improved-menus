@@ -102,7 +102,7 @@ final class MenuEngine
         StringBuilder report = new StringBuilder(validation);
         Context context = context();
         int before=menu.getMenuEntries().length;
-        apply(menu, "", context, report, 0);
+        apply(menu, "", context, report, 0, capture && client.isKeyPressed(KeyCode.KC_SHIFT));
         if (!capture) { cleanOpenedMenu(menu,report,0); }
         if (capture || before != menu.getMenuEntries().length)
         {
@@ -149,13 +149,23 @@ final class MenuEngine
         if (kept.isEmpty() && cancel != null) { kept.add(cancel); report.append("\nKeep Cancel — empty-menu fallback"); }
         if (kept.size() != entries.length) { menu.setMenuEntries(kept.toArray(new MenuEntry[0])); }
     }
-    private void apply(Menu menu, String inheritedTarget, Context context, StringBuilder report, int depth)
+    private void apply(Menu menu, String inheritedTarget, Context context, StringBuilder report, int depth, boolean preserveSwapAnchors)
     {
         if (depth > 8) { return; }
         MenuEntry[] entries = menu.getMenuEntries();
         List<MenuEntry> kept = new ArrayList<>(entries.length);
         for (MenuEntry entry : entries)
         {
+            // Menu Entry Swapper discovers customization targets from native Examine
+            // entries on MenuOpened. Keep both their identity and exact text until
+            // its handler has run; our lower-priority open handler cleans up after it.
+            if (preserveSwapAnchors && isSwapAnchor(entry))
+            {
+                ColorEdit edit = ownedColors.remove(entry);
+                if (edit != null && edit.matches(entry)) { entry.setOption(edit.before); }
+                kept.add(entry);
+                continue;
+            }
             String target = MenuRules.plain(entry.getTarget());
             if (target.isEmpty()) { target = inheritedTarget; }
             String option = MenuRules.plain(entry.getOption());
@@ -165,7 +175,7 @@ final class MenuEngine
                 if (report.length() < 12000) { report.append("\nHide ").append(option).append(" ").append(target).append(" — ").append(reason); }
                 continue;
             }
-            if (entry.getSubMenu() != null) { apply(entry.getSubMenu(), target, context, report, depth + 1); }
+            if (entry.getSubMenu() != null) { apply(entry.getSubMenu(), target, context, report, depth + 1, preserveSwapAnchors); }
             if (config.enableColors())
             {
                 String color = color(target, option);
@@ -185,6 +195,16 @@ final class MenuEngine
         }
         // Do not remove one entry at a time: backed entry objects can be remapped on removal.
         if (kept.size() != entries.length) { menu.setMenuEntries(kept.toArray(new MenuEntry[0])); }
+    }
+    private static boolean isSwapAnchor(MenuEntry entry)
+    {
+        MenuAction type = entry.getType();
+        if (type == MenuAction.EXAMINE_OBJECT || type == MenuAction.EXAMINE_NPC) { return true; }
+        int group = entry.getParam1() >>> 16;
+        return (type == MenuAction.CC_OP || type == MenuAction.CC_OP_LOW_PRIORITY)
+            && (group == InterfaceID.INVENTORY || group == InterfaceID.WORNITEMS)
+            && entry.getIdentifier() == 10
+            && MenuRules.plain(entry.getOption()).equals("Examine");
     }
     String color(String target, String option)
     {

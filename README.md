@@ -76,6 +76,8 @@ Users of the features in this table can consolidate them here after checking the
 
 Keep RuneLite's Menu Entry Swapper for swaps and specialist plugins for their remaining features. Disable overlapping filters/colors before comparing results: this plugin cannot reveal options another plugin has removed.
 
+Menu Entry Swapper's Shift-right-click customization remains available with Examine hiding and menu colors enabled. Menu Workshop keeps its native Examine lookup entries unchanged while building that menu, then applies the configured cleanup after the swap controls have been added.
+
 ## Development
 
 Java 11 is used for the build. Run `gradlew.bat test` for automated checks or `gradlew.bat run` to launch the development client. Tests cover filtering boundaries, order/callback preservation, contexts, profiles/import validation, click origin, tooltip ownership, reveal and cosmetic restoration. No additional production runtime dependency is required.
