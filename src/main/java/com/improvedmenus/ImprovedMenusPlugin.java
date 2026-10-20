@@ -20,7 +20,7 @@ import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.ui.overlay.OverlayManager;
 
-@PluginDescriptor(name="Menu Workshop", description = "Hide unwanted menu options, protect against misclicks, color actions, and save your setup with profiles.", tags={"menu","bank","inventory","misclick","examine","color"})
+@PluginDescriptor(name="Improved Right-Clicks", description = "Customize right-click menus, hide unwanted options, protect against misclicks, and color useful actions.", tags={"menu","bank","inventory","misclick","examine","color"})
 public class ImprovedMenusPlugin extends Plugin
 {
     @Inject private Client client;
@@ -30,6 +30,7 @@ public class ImprovedMenusPlugin extends Plugin
     @Inject private ButtonGuard buttons;
     @Inject private MenuEngine engine;
     @Inject private ProfileStore store;
+    @Inject private RenameNotice renameNotice;
     @Inject private ClientToolbar toolbar;
     @Inject private OverlayManager overlays;
     @Inject private MenuPresentation presentation;
@@ -44,6 +45,7 @@ public class ImprovedMenusPlugin extends Plugin
     @Override protected void startUp()
     {
         active=true;
+        renameNotice.startUp();
         clientThread.invokeLater(() -> { if (active) { engine.reload(); } });
         buttons.startUp(); eventBus.register(buttons); overlays.add(presentation); presentation.start();
         SwingUtilities.invokeLater(this::updateSidePanel);
@@ -51,6 +53,7 @@ public class ImprovedMenusPlugin extends Plugin
     @Override protected void shutDown()
     {
         active=false;
+        renameNotice.shutDown();
         eventBus.unregister(buttons); buttons.shutDown(); overlays.remove(presentation);
         clientThread.invoke(() -> { removeColorEditor(); presentation.stop(); engine.clear(); }); store.clearHistory();
         SwingUtilities.invokeLater(() -> {
@@ -87,7 +90,7 @@ public class ImprovedMenusPlugin extends Plugin
         else if (navigation == null)
         {
             panel=new ImprovedMenusPanel(store,engine,this::openSettings);
-            navigation=NavigationButton.builder().tooltip("Menu Workshop").icon(icon()).priority(6).panel(panel).build();
+            navigation=NavigationButton.builder().tooltip("Improved Right-Clicks").icon(icon()).priority(6).panel(panel).build();
             toolbar.addNavigation(navigation);
         }
     }
@@ -98,11 +101,12 @@ public class ImprovedMenusPlugin extends Plugin
         };
         eventBus.post(new net.runelite.client.events.OverlayMenuClicked(
             new net.runelite.client.ui.overlay.OverlayMenuEntry(MenuAction.RUNELITE_OVERLAY_CONFIG,
-                net.runelite.client.ui.overlay.OverlayManager.OPTION_CONFIGURE,"Menu Workshop"),target));
+                net.runelite.client.ui.overlay.OverlayManager.OPTION_CONFIGURE,"Improved Right-Clicks"),target));
     }
     @Subscribe public void onGameStateChanged(GameStateChanged event)
     {
         if (event.getGameState() != GameState.LOGGED_IN) { buttons.reset(); engine.clear(); }
+        else { renameNotice.showIfLoggedIn(); }
     }
     @Subscribe public void onFocusChanged(FocusChanged event) { if (!event.isFocused()) { clientThread.invoke(buttons::reset); } }
 

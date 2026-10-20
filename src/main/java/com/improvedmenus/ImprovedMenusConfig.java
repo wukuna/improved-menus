@@ -26,9 +26,9 @@ public interface ImprovedMenusConfig extends Config
     String bankSection = "bank";
 
     enum RevealKey { CONTROL, SHIFT, ALT, NONE }
-    @ConfigItem(keyName="revealKey", name="Hold to reveal", description="Hold before opening a menu to reveal options hidden by Menu Workshop", position=0, section=generalSection)
+    @ConfigItem(keyName="revealKey", name="Hold to reveal", description="Hold before opening a menu to reveal options hidden by Improved Right-Clicks", position=0, section=generalSection)
     default RevealKey revealKey() { return RevealKey.CONTROL; }
-    @ConfigItem(keyName="hideSidePanel", name="Hide side panel", description="Hide the Menu Workshop toolbar button; configure all features in RuneLite settings", position=1, section=generalSection)
+    @ConfigItem(keyName="hideSidePanel", name="Hide side panel", description="Hide the Improved Right-Clicks toolbar button; configure all features in RuneLite settings", position=1, section=generalSection)
     default boolean hideSidePanel() { return false; }
     @ConfigItem(keyName="potionEmpty", name="No Empty on potions", description="Hide Empty on dosed inventory potions", position=7, section=hideOptionsSection)
     default boolean potionEmpty() { return false; }

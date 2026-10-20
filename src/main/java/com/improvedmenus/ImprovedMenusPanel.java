@@ -19,7 +19,7 @@ final class ImprovedMenusPanel extends PluginPanel
         this.store=store; this.engine=engine;
         setLayout(new BorderLayout(0,8));
         JPanel top = new JPanel(); top.setLayout(new BoxLayout(top,BoxLayout.Y_AXIS));
-        top.add(new JLabel("Menu Workshop")); top.add(new JLabel("<html>Configure features in RuneLite's<br>Menu Workshop settings.</html>"));
+        top.add(new JLabel("Improved Right-Clicks")); top.add(new JLabel("<html>Configure features in RuneLite's<br>Improved Right-Clicks settings.</html>"));
         button(top,"Open Plugin Settings",openSettings);
         JPanel actions = new JPanel(new GridLayout(0,2,4,4));
         button(actions,"Profiles",this::profiles); button(actions,"Import/export",this::imports);
@@ -54,7 +54,7 @@ final class ImprovedMenusPanel extends PluginPanel
     void run(Runnable action)
     {
         try { action.run(); }
-        catch (IllegalArgumentException e) { status.setText("Check settings"); JOptionPane.showMessageDialog(this,e.getMessage(),"Menu Workshop",JOptionPane.ERROR_MESSAGE); }
+        catch (IllegalArgumentException e) { status.setText("Check settings"); JOptionPane.showMessageDialog(this,e.getMessage(),"Improved Right-Clicks",JOptionPane.ERROR_MESSAGE); }
     }
     private void profiles()
     {
