@@ -20,7 +20,7 @@ import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.ui.overlay.OverlayManager;
 
-@PluginDescriptor(name="Menu Workshop", description="Independent menu protections, item rules, colors and profiles", tags={"menu","bank","inventory","misclick","examine","color"})
+@PluginDescriptor(name="Menu Workshop", description = "Hide unwanted menu options, protect against misclicks, color actions, and save your setup with profiles.", tags={"menu","bank","inventory","misclick","examine","color"})
 public class ImprovedMenusPlugin extends Plugin
 {
     @Inject private Client client;
@@ -86,10 +86,19 @@ public class ImprovedMenusPlugin extends Plugin
         }
         else if (navigation == null)
         {
-            panel=new ImprovedMenusPanel(store,engine);
+            panel=new ImprovedMenusPanel(store,engine,this::openSettings);
             navigation=NavigationButton.builder().tooltip("Menu Workshop").icon(icon()).priority(6).panel(panel).build();
             toolbar.addNavigation(navigation);
         }
+    }
+    private void openSettings()
+    {
+        net.runelite.client.ui.overlay.Overlay target = new net.runelite.client.ui.overlay.Overlay(this) {
+            @Override public java.awt.Dimension render(Graphics2D graphics) { return null; }
+        };
+        eventBus.post(new net.runelite.client.events.OverlayMenuClicked(
+            new net.runelite.client.ui.overlay.OverlayMenuEntry(MenuAction.RUNELITE_OVERLAY_CONFIG,
+                net.runelite.client.ui.overlay.OverlayManager.OPTION_CONFIGURE,"Menu Workshop"),target));
     }
     @Subscribe public void onGameStateChanged(GameStateChanged event)
     {

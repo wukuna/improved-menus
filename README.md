@@ -1,6 +1,8 @@
 # Menu Workshop
 
-Independent RuneLite menu protections, item rules and colors, with grouped settings and profile tools.
+Make RuneLite menus easier to scan and reduce unwanted clicks. Choose independent protections for items, bank actions and interface buttons, hide unwanted options with item rules, and color actions so useful choices stand out. Save named profiles, preview imports and undo changes made through the side panel tools.
+
+Protection switches start off. Enable the features you want in RuneLite's Menu Workshop settings, then use the side panel for profiles, import/export and diagnostics. Hold Ctrl before opening a menu to reveal options hidden by this plugin; the reveal modifier is configurable.
 
 ## Features
 
@@ -14,7 +16,7 @@ Independent RuneLite menu protections, item rules and colors, with grouped setti
 - **Buttons:** normal, right-click-only or hidden modes for Auto Retaliate, XP Drops, bank placeholders and Report. Right-click-only checks where the click began; it does not merely move the action down the list.
 - **Presentation:** action colors, wildcard mappings, submenu support, a Shift-menu color picker/reset with configurable default color, optional ground-loot icons and additional-option counts. Counts support a minimum threshold, including/excluding Examine, showing/hiding counts on interface widgets, and a configurable text color.
 - **Settings:** configure every feature in RuneLite's normal Menu Workshop settings, grouped into collapsible sections. **Hide options** groups Walk here, Cancel, Set heading, Use on Player, Telegrab NPCs, potion Empty and Examine controls. Bank stays last.
-- **Side panel tools:** named profiles, twenty-step undo, validated import/export previews, and diagnostics showing the before/after entry counts and reasons. Settings are not duplicated in the side panel. Undo restores only settings changed by a profile/import/editor operation, leaving later manual changes alone. Operations that change nothing do not consume an undo step; ordinary RuneLite settings use RuneLite's normal controls.
+- **Side panel tools:** a direct Open Plugin Settings shortcut, named profiles, twenty-step undo, validated import/export previews, and collapsible diagnostics showing the before/after entry counts and reasons. Closing a dialog leaves the last operation status unchanged; applying identical settings reports No changes. Settings are not duplicated in the side panel. Undo restores only settings changed by a profile/import/editor operation, leaving later manual changes alone. Operations that change nothing do not consume an undo step; ordinary RuneLite settings use RuneLite's normal controls.
 
 Protection switches start off. Enable the features you want in RuneLite's Menu Workshop settings. Button modes start at Normal. Hold **Ctrl before opening a menu** to reveal options hidden by this plugin. The reveal modifier can be changed to Shift, Alt or None. It does not consume keys or recreate options removed by another plugin.
 

@@ -25,14 +25,25 @@ public class PanelTest
             bind(net.runelite.client.game.ItemManager.class).toInstance(mock(net.runelite.client.game.ItemManager.class)); bind(Client.class).toInstance(client); bind(ImprovedMenusConfig.class).toInstance(config); bind(ConfigManager.class).toInstance(manager); bind(Gson.class).toInstance(new Gson());
         } });
         SwingUtilities.invokeAndWait(() -> {
-            ImprovedMenusPanel panel=new ImprovedMenusPanel(injector.getInstance(ProfileStore.class),injector.getInstance(MenuEngine.class));
+            Runnable openSettings=mock(Runnable.class);
+            ImprovedMenusPanel panel=new ImprovedMenusPanel(injector.getInstance(ProfileStore.class),injector.getInstance(MenuEngine.class),openSettings);
+            components(panel,JButton.class).stream().filter(b -> "Open Plugin Settings".equals(b.getText())).findFirst().get().doClick();
+            verify(openSettings).run();
+            panel.run(() -> {});
+            assertFalse(components(panel,JLabel.class).stream().anyMatch(label -> label.getText().contains("Saved")));
+            panel.applySettings(java.util.Collections.singletonMap("potionEmpty","false"));
+            assertTrue(components(panel,JLabel.class).stream().anyMatch(label -> "No changes".equals(label.getText())));
+            clearInvocations(manager);
             assertEquals(0,components(panel,JCheckBox.class).size());
             assertEquals(0,components(panel,JTextField.class).size());
             assertEquals(0,components(panel,JSpinner.class).size());
             assertEquals(3,components(panel,JButton.class).stream().filter(b -> java.util.Arrays.asList("Profiles","Import/export","Undo").contains(b.getText())).count());
             verifyNoInteractions(manager);
             ProfileStore store=injector.getInstance(ProfileStore.class);
-            store.apply(java.util.Collections.singletonMap("potionEmpty","true"));
+            panel.applySettings(java.util.Collections.singletonMap("potionEmpty","true"));
+            assertTrue(components(panel,JLabel.class).stream().anyMatch(label -> "Settings applied".equals(label.getText())));
+            panel.run(() -> {});
+            assertTrue(components(panel,JLabel.class).stream().anyMatch(label -> "Settings applied".equals(label.getText())));
             clearInvocations(manager);
             components(panel,JButton.class).stream().filter(b -> "Undo".equals(b.getText())).findFirst().get().doClick();
             verify(manager).setConfiguration("improvedmenus","potionEmpty","false");
