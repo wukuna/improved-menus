@@ -52,17 +52,17 @@ final class ImprovedMenusPanel extends PluginPanel
         timer = new javax.swing.Timer(500,e -> { if (isShowing()) { refreshIcons.run(); if(bottom.isVisible()) { preview.setText(engine.diagnostics()); } } });
         timer.start();
     }
-    void addIconControls(ItemIcons icons)
+    void addIconControls(ItemIcons icons, LootFiltersCompatibility compatibility)
     {
         ImprovedMenusConfig config=icons.configs.getConfig(ImprovedMenusConfig.class);
         JCheckBox enabled=new JCheckBox("Show icons in Take menus"); fullWidth(enabled);
         iconSection.add(enabled);
+        JCheckBox linked=new JCheckBox("Loot Filters compatibility"); fullWidth(linked); iconSection.add(linked);
         iconSection.add(new JLabel("Icon source"));
         JComboBox<ImprovedMenusConfig.GroundIconSource> source=new JComboBox<>(ImprovedMenusConfig.GroundIconSource.values()); fullWidth(source);
         iconSection.add(source);
-        iconSection.add(help("Native: item pictures. Custom: imported or assigned icons. Both: custom + item pictures."));
-        iconSection.add(help("Loot Filters setup is not linked automatically. Import the same Filterscape script here first."));
-        button(iconSection,"Import Loot Filters script",() -> { openIconEditor(icons); iconEditor.importLoot(); });
+        iconSection.add(help("Native: item pictures. Custom: Loot Filters or assigned icons. Both: custom + item pictures."));
+        iconSection.add(help("Compatibility uses a supporting Loot Filters version automatically. Choose Custom or Both. No file upload is needed."));
         JLabel imported=help(""); iconSection.add(imported);
         button(iconSection,"Manage icons / backups",() -> openIconEditor(icons));
         iconSection.add(help("Colors stay separate. Icons are saved per RuneLite profile."));
@@ -70,12 +70,14 @@ final class ImprovedMenusPanel extends PluginPanel
         refreshIcons=() -> {
             syncing[0]=true;
             enabled.setSelected(config.groundIcons());
+            linked.setSelected(config.lootFiltersCompatibility());
             source.setSelectedItem(config.groundIconSource());
             syncing[0]=false;
-            String text=wrapped(icons.filters.status());
+            String text=wrapped(config.lootFiltersCompatibility() ? compatibility.status() : icons.filters.status());
             if(!text.equals(imported.getText())) { imported.setText(text); revalidate(); }
         };
         enabled.addActionListener(e -> { if(!syncing[0]) icons.configs.setConfiguration(ImprovedMenusConfig.GROUP,"groundIcons",enabled.isSelected()); });
+        linked.addActionListener(e -> { if(!syncing[0]) { compatibility.reset(); icons.configs.setConfiguration(ImprovedMenusConfig.GROUP,"lootFiltersCompatibility",linked.isSelected()); } });
         source.addActionListener(e -> { if(!syncing[0]) icons.configs.setConfiguration(ImprovedMenusConfig.GROUP,"groundIconSource",source.getSelectedItem()); });
         refreshIcons.run();
     }

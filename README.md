@@ -53,7 +53,7 @@ Exact color mappings take precedence over wildcard mappings. Hold Shift when ope
 
 **Yellow hover highlight** is enabled by default: a colored main-menu option uses the native yellow highlight while hovered, then returns to its configured color. Submenu entries retain their configured colors because RuneLite does not expose which submenu is open for reliable hover detection. Disable it to retain the configured color on hover. Item/name colors and image tags are preserved.
 
-**Default picker color** applies when an entry has no matching color mapping. **Option count text color** changes the hover count. Both colors use `#RRGGBB` in RuneLite settings. The Shift menu color editor provides an interactive picker for menu entries. **Minimum extra options** accepts 1–500. Counts exclude Cancel, Walk here and local editor actions; **Count Examine** and **Show count on interface widgets** control the remaining categories. These settings are included in profiles, undo and imports.
+**Default picker color** applies when an entry has no matching color mapping. **Option count text color** changes the hover count. Both colors use `#RRGGBB` in RuneLite settings. The Shift menu color editor provides an interactive picker for menu entries. **Minimum extra options** accepts 1â€“500. Counts exclude Cancel, Walk here and local editor actions; **Count Examine** and **Show count on interface widgets** control the remaining categories. These settings are included in profiles, undo and imports.
 
 The editor accepts at most 200 rules per field. Invalid manual configuration edits disable that rule field rather than retaining old invisible rules. Profile imports validate every setting before applying changes. Imports cannot modify other plugins' settings. Existing-setting import reads explicitly saved settings from the supported plugins listed below and leaves those originals intact. Missing settings and source-plugin enablement are not inferred.
 
@@ -110,3 +110,9 @@ Review the rule/image counts before applying. A new import replaces the previous
 Menu entries do not always identify which of several identical ground stacks they refer to. If those stacks would produce different icons, we fall back to Native rather than guess. Submenu icon drawing remains unsupported by the existing public menu-bounds integration.
 
 The RS2F lexer, preprocessor, parser, condition classes and preamble are adapted from [riktenx/loot-filters at 993fd054](https://github.com/riktenx/loot-filters/tree/993fd054e08d42a77d3415acbb9ac7c2797726ed), under its [BSD 2-Clause license](src/main/resources/com/improvedmenus/loot-filters-LICENSE.txt). Our adapter supplies read-only ground-item facts and consumes only the chosen icon; source display/audio properties are parsed but never executed. No changes or submissions are made to the upstream plugin. The supplied Filterscape, Joe and Ironman presets are used as local compatibility fixtures, not bundled in the plugin.
+
+### Optional Loot Filters compatibility (pending upstream support)
+
+Enable **Loot Filters compatibility** directly above **Icon source**, then choose **Custom** or **Both**. A supporting Loot Filters version supplies its selected icons, including custom images, to Take menus automatically. Native uses ordinary item pictures. Colors remain controlled separately. No script or image upload is required for the connection.
+
+Until the proposed Loot Filters message API is released, the connection falls back to native icons. Existing saved assignments and imported backups remain intact; turn compatibility off to use the existing imported rules. Manual item assignments continue to take priority. The side panel reports whether Loot Filters responded after opening a Take menu.

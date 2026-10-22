@@ -91,9 +91,11 @@ public interface ImprovedMenusConfig extends Config
         GroundIconSource(String label) { this.label=label; }
         @Override public String toString() { return label; }
     }
-    @ConfigItem(keyName="groundIconSource", name="Icon source", description="Used when Ground loot icons is enabled. Custom uses your imported or manually assigned icons. Both shows custom and item icons; missing assignments fall back to Native. Colors are controlled separately.", position=27, section=presentationSection)
+    @ConfigItem(keyName="lootFiltersCompatibility", name="Loot Filters compatibility", description="Use icons selected by a compatible Loot Filters version without importing files. Requires Custom or Both. Colors stay separate; unavailable icons fall back to Native.", position=27, section=presentationSection)
+    default boolean lootFiltersCompatibility() { return false; }
+    @ConfigItem(keyName="groundIconSource", name="Icon source", description="Used when Ground loot icons is enabled. Custom uses Loot Filters when compatibility is enabled, otherwise imported icons. Manual assignments take priority. Both shows custom and item icons; missing assignments fall back to Native. Colors are controlled separately.", position=28, section=presentationSection)
     default GroundIconSource groundIconSource() { return GroundIconSource.NATIVE; }
-    @ConfigItem(keyName="optionCount", name="Additional option count", description="Show the number of other available actions on hover", position=27, section=presentationSection)
+    @ConfigItem(keyName="optionCount", name="Additional option count", description="Show the number of other available actions on hover", position=29, section=presentationSection)
     default boolean optionCount() { return false; }
     @ConfigItem(keyName="hideCancel", name="Hide Cancel", description="Hide Cancel in opened right-click menus; keep a safe fallback if nothing remains", position=1, section=hideOptionsSection)
     default boolean hideCancel() { return false; }

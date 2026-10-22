@@ -35,6 +35,7 @@ public class ImprovedMenusPlugin extends Plugin
     @Inject private OverlayManager overlays;
     @Inject private MenuPresentation presentation;
     @Inject private ItemIcons itemIcons;
+    @Inject private LootFiltersCompatibility lootCompatibility;
     private ImprovedMenusPanel panel;
     private NavigationButton navigation;
     private volatile boolean active;
@@ -47,6 +48,7 @@ public class ImprovedMenusPlugin extends Plugin
     {
         active=true;
         presentation.setItemIcons(itemIcons);
+        eventBus.register(lootCompatibility);
         if(itemIcons.filters!=null) { itemIcons.filters.reload(); }
         renameNotice.startUp();
         clientThread.invokeLater(() -> { if (active) { engine.reload(); } });
@@ -57,6 +59,7 @@ public class ImprovedMenusPlugin extends Plugin
     {
         active=false;
         renameNotice.shutDown();
+        eventBus.unregister(lootCompatibility); lootCompatibility.reset();
         eventBus.unregister(buttons); buttons.shutDown(); overlays.remove(presentation);
         clientThread.invoke(() -> { removeColorEditor(); presentation.stop(); engine.clear(); }); store.clearHistory();
         SwingUtilities.invokeLater(() -> {
@@ -82,7 +85,7 @@ public class ImprovedMenusPlugin extends Plugin
             if (event.getKey().equals("hideSidePanel")) { SwingUtilities.invokeLater(this::updateSidePanel); }
         }
     }
-    @Subscribe public void onProfileChanged(net.runelite.client.events.ProfileChanged event) { if(itemIcons.filters!=null) { itemIcons.filters.reload(); } }
+    @Subscribe public void onProfileChanged(net.runelite.client.events.ProfileChanged event) { lootCompatibility.reset(); if(itemIcons.filters!=null) { itemIcons.filters.reload(); } }
     @Subscribe public void onBeforeMenuRender(BeforeMenuRender event)
     { if (active && client.isMenuOpen()) { engine.highlightHovered(client.getMenu()); } }
     private void updateSidePanel()
@@ -95,7 +98,7 @@ public class ImprovedMenusPlugin extends Plugin
         else if (navigation == null)
         {
             panel=new ImprovedMenusPanel(store,engine,this::openSettings);
-            panel.addIconControls(itemIcons);
+            panel.addIconControls(itemIcons,lootCompatibility);
             navigation=NavigationButton.builder().tooltip("Improved Right-Clicks").icon(icon()).priority(6).panel(panel).build();
             toolbar.addNavigation(navigation);
         }

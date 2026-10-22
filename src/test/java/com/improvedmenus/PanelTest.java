@@ -53,10 +53,12 @@ public class PanelTest
             when(manager.getConfig(ImprovedMenusConfig.class)).thenReturn(config);
             when(config.groundIconSource()).thenReturn(ImprovedMenusConfig.GroundIconSource.NATIVE);
             clearInvocations(manager);
-            panel.addIconControls(library);
+            panel.addIconControls(library,new LootFiltersCompatibility());
             verify(manager,never()).setConfiguration(anyString(),anyString(),any());
             components(panel,JCheckBox.class).get(0).doClick();
             verify(manager).setConfiguration("improvedmenus","groundIcons",true);
+            components(panel,JCheckBox.class).stream().filter(b -> b.getText().equals("Loot Filters compatibility")).findFirst().get().doClick();
+            verify(manager).setConfiguration("improvedmenus","lootFiltersCompatibility",true);
             components(panel,JComboBox.class).get(0).setSelectedItem(ImprovedMenusConfig.GroundIconSource.BOTH);
             verify(manager).setConfiguration("improvedmenus","groundIconSource",ImprovedMenusConfig.GroundIconSource.BOTH);
             panel.setSize(225,850); layout(panel);
