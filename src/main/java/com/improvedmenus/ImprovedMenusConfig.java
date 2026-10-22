@@ -84,6 +84,15 @@ public interface ImprovedMenusConfig extends Config
     default boolean deprioritizeLeftClickOffEntries() { return true; }
     @ConfigItem(keyName="groundIcons", name="Ground loot icons", description="Show item icons in Take menus", position=26, section=presentationSection)
     default boolean groundIcons() { return false; }
+    enum GroundIconSource
+    {
+        NATIVE("Native"), CUSTOM("Custom"), BOTH("Both");
+        private final String label;
+        GroundIconSource(String label) { this.label=label; }
+        @Override public String toString() { return label; }
+    }
+    @ConfigItem(keyName="groundIconSource", name="Icon source", description="Used when Ground loot icons is enabled. Custom uses your imported or manually assigned icons. Both shows custom and item icons; missing assignments fall back to Native. Colors are controlled separately.", position=27, section=presentationSection)
+    default GroundIconSource groundIconSource() { return GroundIconSource.NATIVE; }
     @ConfigItem(keyName="optionCount", name="Additional option count", description="Show the number of other available actions on hover", position=27, section=presentationSection)
     default boolean optionCount() { return false; }
     @ConfigItem(keyName="hideCancel", name="Hide Cancel", description="Hide Cancel in opened right-click menus; keep a safe fallback if nothing remains", position=1, section=hideOptionsSection)

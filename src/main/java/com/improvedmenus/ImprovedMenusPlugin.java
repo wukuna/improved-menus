@@ -34,6 +34,7 @@ public class ImprovedMenusPlugin extends Plugin
     @Inject private ClientToolbar toolbar;
     @Inject private OverlayManager overlays;
     @Inject private MenuPresentation presentation;
+    @Inject private ItemIcons itemIcons;
     private ImprovedMenusPanel panel;
     private NavigationButton navigation;
     private volatile boolean active;
@@ -45,6 +46,8 @@ public class ImprovedMenusPlugin extends Plugin
     @Override protected void startUp()
     {
         active=true;
+        presentation.setItemIcons(itemIcons);
+        if(itemIcons.filters!=null) { itemIcons.filters.reload(); }
         renameNotice.startUp();
         clientThread.invokeLater(() -> { if (active) { engine.reload(); } });
         buttons.startUp(); eventBus.register(buttons); overlays.add(presentation); presentation.start();
@@ -74,10 +77,12 @@ public class ImprovedMenusPlugin extends Plugin
     {
         if (ImprovedMenusConfig.GROUP.equals(event.getGroup()))
         {
+            if(itemIcons.filters!=null && (event.getKey().equals(FilterIcons.KEY) || event.getKey().equals(FilterIcons.BACKUP))) { itemIcons.filters.reload(); }
             clientThread.invokeLater(() -> { if (active) { if (!config.groundIcons()) { presentation.stop(); } engine.reload(); } });
             if (event.getKey().equals("hideSidePanel")) { SwingUtilities.invokeLater(this::updateSidePanel); }
         }
     }
+    @Subscribe public void onProfileChanged(net.runelite.client.events.ProfileChanged event) { if(itemIcons.filters!=null) { itemIcons.filters.reload(); } }
     @Subscribe public void onBeforeMenuRender(BeforeMenuRender event)
     { if (active && client.isMenuOpen()) { engine.highlightHovered(client.getMenu()); } }
     private void updateSidePanel()
@@ -90,6 +95,7 @@ public class ImprovedMenusPlugin extends Plugin
         else if (navigation == null)
         {
             panel=new ImprovedMenusPanel(store,engine,this::openSettings);
+            panel.addIconControls(itemIcons);
             navigation=NavigationButton.builder().tooltip("Improved Right-Clicks").icon(icon()).priority(6).panel(panel).build();
             toolbar.addNavigation(navigation);
         }

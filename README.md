@@ -91,3 +91,22 @@ A short live smoke check is still needed for real menu rendering: try a dosed po
 Ground loot icons decorate the main right-click menu only. Submenus keep their original target text because RuneLite does not expose whether a submenu is open for reliable icon positioning. Reopening a menu and disabling icons restore the target text owned by Improved Right-Clicks.
 
 Tool guards leave the knife-cut Temple Trekking swamp vines and quest Cave entrance interactions available. Ordinary axe and pickaxe protections remain independent.
+
+
+### Custom ground-menu icons
+
+Open **Ground loot menu icons** in the side panel, enable **Show icons in Take menus**, and select **Native**, **Custom**, or **Both**. Native shows item pictures; Custom shows imported or manually assigned icons; Both shows custom and item pictures together. Missing assignments fall back to Native. Both avoids duplicating Current Item or the same item ID. Menu colors stay separate.
+
+**Loot Filters is not linked automatically.** Click **Import Loot Filters script** and import the same Filterscape export you use there. Confirm the import; its rule count appears in the side panel. Import again when you change that script. The original Loot Filters setup is never modified.
+
+Choose **Manage icons / backups** to assign Heart, Star, Diamond, Current Item or an image file to an exact item name. Use tradeable-item search or enter an untradeable item's exact name. Manual assignments take priority over the imported filter; the editor labels them separately from imported rules.
+
+**Import Loot Filters** accepts a generated Filterscape text file (`.rs2f` or `.txt`) or pasted text. It preserves the original RS2F source and evaluates macros (including parameters), boolean conditions, wildcard names, item IDs, quantity and value comparisons, tradeability, noted/stackable state, ownership, account type, and areas. `apply` inherits icon values; terminal `rule`/`if` stops at the first matching rule, including rules without an explicit icon. These rules choose icons beside **Take** menu entries only. Ground overlays, hiding, sorting, sounds, loot beams and colors are not activated by this import.
+
+`CurrentItem()`, `Item(id)`, `Sprite(id,index)` and `File("name.png")` icons are supported. If a filter references files, select its icons directory (usually `.runelite/loot-filters/icons`). Every referenced image must be available before the import applies. PNG, JPEG and GIF are decoded to a transparent, aspect-preserving 17 x 15 menu image; GIF uses its first frame. Copies are embedded in our configuration, so uninstalling Loot Filters or removing the original files does not break the imported setup. Invalid paths, missing files and malformed filters leave the previous setup intact. Limits: 1 MB filter text, 128 images, 2 MB / 2048 x 2048 per source image, bounded macro expansion and rule nesting.
+
+Review the rule/image counts before applying. A new import replaces the previous imported filter; manual assignments stay. **Undo filter import** swaps with the previous saved filter. **Filter setup / backup** exports/imports a self-contained JSON bundle with compressed original source and embedded images, or disables the imported filter. **Import/export icons** and **Undo / redo** separately manage manual assignments. Data is saved per RuneLite profile in our `improvedmenus` configuration. Imports never modify Loot Filters files or settings and never fetch a filter or image from the network.
+
+Menu entries do not always identify which of several identical ground stacks they refer to. If those stacks would produce different icons, we fall back to Native rather than guess. Submenu icon drawing remains unsupported by the existing public menu-bounds integration.
+
+The RS2F lexer, preprocessor, parser, condition classes and preamble are adapted from [riktenx/loot-filters at 993fd054](https://github.com/riktenx/loot-filters/tree/993fd054e08d42a77d3415acbb9ac7c2797726ed), under its [BSD 2-Clause license](src/main/resources/com/improvedmenus/loot-filters-LICENSE.txt). Our adapter supplies read-only ground-item facts and consumes only the chosen icon; source display/audio properties are parsed but never executed. No changes or submissions are made to the upstream plugin. The supplied Filterscape, Joe and Ironman presets are used as local compatibility fixtures, not bundled in the plugin.

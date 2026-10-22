@@ -48,6 +48,17 @@ public class PanelTest
             components(panel,JButton.class).stream().filter(b -> "Undo".equals(b.getText())).findFirst().get().doClick();
             verify(manager).setConfiguration("improvedmenus","potionEmpty","false");
             assertTrue(components(panel,JLabel.class).stream().anyMatch(label -> "Undone".equals(label.getText())));
+            ItemIcons library=mock(ItemIcons.class); library.configs=manager; library.filters=mock(FilterIcons.class);
+            when(library.filters.status()).thenReturn("484 imported rules; 0 embedded images");
+            when(manager.getConfig(ImprovedMenusConfig.class)).thenReturn(config);
+            when(config.groundIconSource()).thenReturn(ImprovedMenusConfig.GroundIconSource.NATIVE);
+            clearInvocations(manager);
+            panel.addIconControls(library);
+            verify(manager,never()).setConfiguration(anyString(),anyString(),any());
+            components(panel,JCheckBox.class).get(0).doClick();
+            verify(manager).setConfiguration("improvedmenus","groundIcons",true);
+            components(panel,JComboBox.class).get(0).setSelectedItem(ImprovedMenusConfig.GroundIconSource.BOTH);
+            verify(manager).setConfiguration("improvedmenus","groundIconSource",ImprovedMenusConfig.GroundIconSource.BOTH);
             panel.setSize(225,850); layout(panel);
             BufferedImage image=new BufferedImage(225,850,BufferedImage.TYPE_INT_RGB); Graphics2D g=image.createGraphics(); panel.printAll(g); g.dispose();
             try { ImageIO.write(image,"png",new File("build/ui-preview.png")); } catch (java.io.IOException e) { throw new AssertionError(e); }

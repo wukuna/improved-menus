@@ -27,6 +27,8 @@ final class MenuPresentation extends Overlay
     @Inject private ChatIconManager icons;
     @Inject private TooltipManager tooltips;
     private int placeholder = -1;
+    private ItemIcons itemIcons;
+    void setItemIcons(ItemIcons library) { itemIcons=library; }
     private final IdentityHashMap<MenuEntry,TargetEdit> ownedTargets = new IdentityHashMap<>();
     private String marker = "";
 
@@ -56,8 +58,16 @@ final class MenuPresentation extends Overlay
             if (GROUND.contains(entry.getType()) && "Take".equals(MenuRules.plain(entry.getOption())))
             {
                 String original=entry.getTarget();
-                String decorated = marker + original;
-                ownedTargets.put(entry,new TargetEdit(entry,original,decorated));
+                ImprovedMenusConfig.GroundIconSource source=config.groundIconSource();
+                ItemIcons.Assignment custom=source==ImprovedMenusConfig.GroundIconSource.NATIVE || source==null || itemIcons==null ? null : itemIcons.find(entry.getIdentifier());
+                if(custom==null && source!=null && source!=ImprovedMenusConfig.GroundIconSource.NATIVE && itemIcons!=null && itemIcons.filters!=null) { custom=itemIcons.filters.find(entry); }
+                boolean both=source==ImprovedMenusConfig.GroundIconSource.BOTH && custom!=null
+                    && custom.kind!=ItemIcons.Kind.CURRENT_ITEM && !(custom.kind==ItemIcons.Kind.ITEM && custom.iconId==entry.getIdentifier());
+                String decorated = marker+(both ? marker : "")+original;
+                TargetEdit edit=new TargetEdit(entry,original,decorated);
+                edit.custom=custom; edit.both=both;
+                if (decorated.equals(original)) { continue; }
+                ownedTargets.put(entry,edit);
                 entry.setTarget(decorated);
             }
         }
@@ -105,15 +115,19 @@ final class MenuPresentation extends Overlay
         for (int i=0;i<entries.length;i++)
         {
             MenuEntry entry=entries[i];
-            if (!GROUND.contains(entry.getType()) || !"Take".equals(MenuRules.plain(entry.getOption())) || !entry.getTarget().startsWith(marker)) { continue; }
+            TargetEdit edit=ownedTargets.get(entry);
+            if (edit==null || !edit.matches(entry) || !entry.getTarget().startsWith(marker)) { continue; }
             int y=menu.getMenuY()+19+(entries.length-1-i-scroll)*15;
             if (y < menu.getMenuY()+19 || y+15 > menu.getMenuY()+menu.getMenuHeight()) { continue; }
             int x=menu.getMenuX()+8+metrics.stringWidth(MenuRules.plain(entry.getOption())+" ");
-            g.drawImage(items.getImage(entry.getIdentifier(),Integer.MAX_VALUE,false),x,y,17,15,null);
+            BufferedImage custom=edit.custom==null || itemIcons==null ? null : itemIcons.image(edit.custom,entry.getIdentifier());
+            g.drawImage(custom==null ? items.getImage(entry.getIdentifier(),Integer.MAX_VALUE,false) : custom,x,y,17,15,null);
+            if(edit.both && custom!=null) { g.drawImage(items.getImage(entry.getIdentifier(),Integer.MAX_VALUE,false),x+17,y,17,15,null); }
         }
     }
     private static final class TargetEdit
     {
+        ItemIcons.Assignment custom; boolean both;
         final String original, decorated;
         final MenuAction type;
         final int identifier, param0, param1;

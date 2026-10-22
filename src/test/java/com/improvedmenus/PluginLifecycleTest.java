@@ -24,6 +24,9 @@ public class PluginLifecycleTest
     {
         Client client=mock(Client.class); ClientThread thread=mock(ClientThread.class); ImprovedMenusConfig config=mock(ImprovedMenusConfig.class);
         ConfigManager manager=mock(ConfigManager.class); EventBus bus=mock(EventBus.class); MouseManager mouse=mock(MouseManager.class);
+        ItemIcons library=mock(ItemIcons.class); library.configs=manager; library.filters=mock(FilterIcons.class);
+        when(library.filters.status()).thenReturn("No imported filter active");
+        when(manager.getConfig(ImprovedMenusConfig.class)).thenReturn(config);
         ClientToolbar toolbar=mock(ClientToolbar.class); OverlayManager overlays=mock(OverlayManager.class); ChatIconManager icons=mock(ChatIconManager.class);
         when(config.itemRules()).thenReturn(""); when(config.colors()).thenReturn(""); when(config.exceptions()).thenReturn("");
         doAnswer(i -> { ((Runnable)i.getArgument(0)).run(); return null; }).when(thread).invoke(any(Runnable.class));
@@ -31,7 +34,7 @@ public class PluginLifecycleTest
         Injector injector=Guice.createInjector(new AbstractModule() { protected void configure() {
             bind(net.runelite.client.chat.ChatMessageManager.class).toInstance(mock(net.runelite.client.chat.ChatMessageManager.class));
             bind(Client.class).toInstance(client); bind(ClientThread.class).toInstance(thread); bind(ImprovedMenusConfig.class).toInstance(config);
-            bind(ConfigManager.class).toInstance(manager); bind(Gson.class).toInstance(new Gson()); bind(EventBus.class).toInstance(bus);
+            bind(net.runelite.client.game.SpriteManager.class).toInstance(mock(net.runelite.client.game.SpriteManager.class)); bind(java.util.concurrent.ScheduledExecutorService.class).toInstance(mock(java.util.concurrent.ScheduledExecutorService.class)); bind(ItemIcons.class).toInstance(library); bind(ConfigManager.class).toInstance(manager); bind(Gson.class).toInstance(new Gson()); bind(EventBus.class).toInstance(bus);
             bind(MouseManager.class).toInstance(mouse); bind(ClientToolbar.class).toInstance(toolbar); bind(OverlayManager.class).toInstance(overlays);
             bind(ChatIconManager.class).toInstance(icons); bind(ItemManager.class).toInstance(mock(ItemManager.class)); bind(TooltipManager.class).toInstance(mock(TooltipManager.class));
         } });

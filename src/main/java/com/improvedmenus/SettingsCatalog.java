@@ -51,6 +51,7 @@ final class SettingsCatalog
         add("report", "Report", "Buttons", "NORMAL", "NORMAL", "LEFT_CLICK_OFF", "DISABLED");
         bool("deprioritizeLeftClickOffEntries", "Deprioritize protected buttons", "Buttons", true);
         bool("groundIcons", "Ground loot icons", "Presentation", false);
+        add("groundIconSource", "Icon source", "Presentation", "NATIVE", "NATIVE", "CUSTOM", "BOTH");
         bool("optionCount", "Additional option count", "Presentation", false);
         add("minimumOptions", "Minimum extra options", "Presentation", "1");
         bool("countExamine", "Count Examine", "Presentation", true);
