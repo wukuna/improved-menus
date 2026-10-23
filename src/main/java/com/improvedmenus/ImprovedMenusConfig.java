@@ -116,6 +116,13 @@ public interface ImprovedMenusConfig extends Config
     default boolean countExamine() { return true; }
     @ConfigItem(keyName="countOnWidgets", name="Show count on interface widgets", description="Show counts on inventory, bank, shop and other interface widgets", position=41, section=presentationSection)
     default boolean countOnWidgets() { return true; }
+    @ConfigItem(keyName="countHidePlayers", name="Hide player option counts", description="Exclude player actions from the hover count without hiding overlapping loot or object options", position=44, section=presentationSection)
+    default boolean countHidePlayers() { return false; }
+    @ConfigItem(keyName="countHideWalkHere", name="Hide counts when Walk here", description="Exclude deprioritized NPC and object options when Walk here is the preferred action; loot and interface options remain counted", position=45, section=presentationSection)
+    default boolean countHideWalkHere() { return false; }
+    enum CountAnchor { BELOW_LEFT, BELOW_RIGHT, ABOVE_LEFT, ABOVE_RIGHT }
+    @ConfigItem(keyName="countAnchor", name="Option count anchor", description="Position relative to the hover tooltip stack; RuneLite still controls whether the stack is above or below the cursor", position=46, section=presentationSection)
+    default CountAnchor countAnchor() { return CountAnchor.BELOW_LEFT; }
     @ConfigItem(keyName="optionCountColor", name="Option count text color", description="Color in #RRGGBB format", position=42, section=presentationSection)
     default String optionCountColor() { return "#ffffff"; }
     @ConfigItem(keyName="defaultPickerColor", name="Default picker color", description="Initial color for entries with no matching color rule, in #RRGGBB format", position=43, section=colorsSection)

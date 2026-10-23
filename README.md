@@ -110,3 +110,9 @@ Review the rule/image counts before applying. A new import replaces the previous
 Menu entries do not always identify which of several identical ground stacks they refer to. If those stacks would produce different icons, we fall back to Native rather than guess. Submenu icon drawing remains unsupported by the existing public menu-bounds integration.
 
 The RS2F lexer, preprocessor, parser, condition classes and preamble are adapted from [riktenx/loot-filters at 993fd054](https://github.com/riktenx/loot-filters/tree/993fd054e08d42a77d3415acbb9ac7c2797726ed), under its [BSD 2-Clause license](src/main/resources/com/improvedmenus/loot-filters-LICENSE.txt). Our adapter supplies read-only ground-item facts and consumes only the chosen icon; source display/audio properties are parsed but never executed. No changes or submissions are made to the upstream plugin. The supplied Filterscape, Joe and Ironman presets are used as local compatibility fixtures, not bundled in the plugin.
+
+### Additional option indicator
+
+Under Presentation, **Hide player option counts** excludes player actions while retaining loot and object actions underneath them. **Hide counts when Walk here** suppresses deprioritized NPC/object counts when walking is preferred; ground items and widgets remain eligible. These switches affect only the hover indicator, not the menu entries. Both start off.
+
+**Option count anchor** offers Below left (the existing default), Below right, Above left and Above right relative to the tooltip stack. RuneLite still controls the stack position relative to the cursor. All options are saved in profiles and support import/export and undo.

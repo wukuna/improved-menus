@@ -56,6 +56,9 @@ final class SettingsCatalog
         add("minimumOptions", "Minimum extra options", "Presentation", "1");
         bool("countExamine", "Count Examine", "Presentation", true);
         bool("countOnWidgets", "Show count on interface widgets", "Presentation", true);
+        bool("countHidePlayers", "Hide player option counts", "Presentation", false);
+        bool("countHideWalkHere", "Hide counts when Walk here", "Presentation", false);
+        add("countAnchor", "Option count anchor", "Presentation", "BELOW_LEFT", "BELOW_LEFT", "BELOW_RIGHT", "ABOVE_LEFT", "ABOVE_RIGHT");
         add("optionCountColor", "Option count text color", "Presentation", "#ffffff");
         bool("hideCancel", "Hide Cancel (right-click menu)", "Menu cleanup", false);
         bool("hideWalkHere", "Hide Walk here (right-click menu)", "Menu cleanup", false);

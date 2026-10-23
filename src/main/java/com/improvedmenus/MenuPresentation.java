@@ -26,6 +26,7 @@ final class MenuPresentation extends Overlay
     @Inject private ItemManager items;
     @Inject private ChatIconManager icons;
     @Inject private TooltipManager tooltips;
+    @Inject private net.runelite.client.config.RuneLiteConfig runeLiteConfig;
     private int placeholder = -1;
     private ItemIcons itemIcons;
     void setItemIcons(ItemIcons library) { itemIcons=library; }
@@ -80,11 +81,16 @@ final class MenuPresentation extends Overlay
         }
         else if (config.optionCount())
         {
-            int count=additionalCount(client.getMenu().getMenuEntries(),config.countExamine(),config.countOnWidgets());
+            int count=additionalCount(client.getMenu().getMenuEntries(),config.countExamine(),config.countOnWidgets(),config.countHidePlayers(),config.countHideWalkHere());
             if (count >= Math.max(1,config.minimumOptions()) && client.getMouseCanvasPosition().getX() >= 0)
             {
                 java.awt.Color color=SettingsCatalog.colorOrDefault(config.optionCountColor(),java.awt.Color.WHITE);
-                tooltips.add(new Tooltip(String.format("<col=%06x>+%d options</col>",color.getRGB() & 0xffffff,count)));
+                String text=String.format("<col=%06x>+%d options</col>",color.getRGB() & 0xffffff,count);
+                ImprovedMenusConfig.CountAnchor anchor=config.countAnchor();
+                Tooltip tooltip=anchor==ImprovedMenusConfig.CountAnchor.BELOW_RIGHT || anchor==ImprovedMenusConfig.CountAnchor.ABOVE_RIGHT
+                    ? new Tooltip(new OptionCountTooltip(text,tooltips,client,runeLiteConfig.overlayBackgroundColor())) : new Tooltip(text);
+                if (anchor==ImprovedMenusConfig.CountAnchor.ABOVE_LEFT || anchor==ImprovedMenusConfig.CountAnchor.ABOVE_RIGHT) { tooltips.addFront(tooltip); }
+                else { tooltips.add(tooltip); }
             }
         }
         return null;
@@ -92,19 +98,56 @@ final class MenuPresentation extends Overlay
     static int additionalCount(MenuEntry[] entries)
     { return additionalCount(entries,true,true); }
     static int additionalCount(MenuEntry[] entries,boolean countExamine,boolean countOnWidgets)
+    { return additionalCount(entries,countExamine,countOnWidgets,false,false); }
+    static int additionalCount(MenuEntry[] entries,boolean countExamine,boolean countOnWidgets,boolean hidePlayers,boolean hideWalkHere)
     {
+        MenuEntry primary=entries.length==0 ? null : entries[entries.length-1];
+        // Ignore players only when choosing whether the remaining world target is Walk here.
+        MenuEntry worldPrimary=primary;
+        if (hidePlayers)
+        {
+            worldPrimary=null;
+            for (int i=entries.length-1;i>=0;i--)
+            {
+                if (!isPlayer(entries[i].getType()) && entries[i].getType()!=MenuAction.CANCEL)
+                { worldPrimary=entries[i]; break; }
+            }
+        }
+        boolean walking=hideWalkHere && worldPrimary!=null && worldPrimary.getType()==MenuAction.WALK;
         int count=0;
+        boolean primaryCounted=false;
         for (MenuEntry entry : entries)
         {
             MenuAction type=entry.getType();
+            if (hidePlayers && isPlayer(type)) { continue; }
+            if (walking && isNpcOrObject(type)) { continue; }
             if (!countOnWidgets && entry.getWidget() != null) { continue; }
             if (!countExamine && (type == MenuAction.EXAMINE_NPC || type == MenuAction.EXAMINE_OBJECT
                 || type == MenuAction.EXAMINE_ITEM_GROUND || MenuRules.plain(entry.getOption()).equalsIgnoreCase("Examine"))) { continue; }
             if (type != MenuAction.CANCEL && type != MenuAction.WALK && type != MenuAction.WIDGET_CONTINUE
                 && type != MenuAction.RUNELITE && type != MenuAction.RUNELITE_OVERLAY && type != MenuAction.RUNELITE_OVERLAY_CONFIG)
-            { count++; }
+            { count++; if (entry==primary) { primaryCounted=true; } }
         }
-        return Math.max(0,count-1);
+        // Preserve the original count when the new filters are off. With filters on,
+        // only subtract the actual default action if it survived the filtering.
+        return Math.max(0,count-(!hidePlayers && !hideWalkHere || primaryCounted ? 1 : 0));
+    }
+    private static boolean isPlayer(MenuAction type)
+    {
+        return type==MenuAction.WIDGET_TARGET_ON_PLAYER || type==MenuAction.ITEM_USE_ON_PLAYER || type==MenuAction.RUNELITE_PLAYER
+            || type==MenuAction.PLAYER_FIRST_OPTION || type==MenuAction.PLAYER_SECOND_OPTION || type==MenuAction.PLAYER_THIRD_OPTION
+            || type==MenuAction.PLAYER_FOURTH_OPTION || type==MenuAction.PLAYER_FIFTH_OPTION || type==MenuAction.PLAYER_SIXTH_OPTION
+            || type==MenuAction.PLAYER_SEVENTH_OPTION || type==MenuAction.PLAYER_EIGHTH_OPTION;
+    }
+    private static boolean isNpcOrObject(MenuAction type)
+    {
+        return type==MenuAction.NPC_FIRST_OPTION || type==MenuAction.NPC_SECOND_OPTION || type==MenuAction.NPC_THIRD_OPTION
+            || type==MenuAction.NPC_FOURTH_OPTION || type==MenuAction.NPC_FIFTH_OPTION || type==MenuAction.EXAMINE_NPC
+            || type==MenuAction.ITEM_USE_ON_NPC || type==MenuAction.WIDGET_TARGET_ON_NPC
+            || type==MenuAction.GAME_OBJECT_FIRST_OPTION || type==MenuAction.GAME_OBJECT_SECOND_OPTION
+            || type==MenuAction.GAME_OBJECT_THIRD_OPTION || type==MenuAction.GAME_OBJECT_FOURTH_OPTION
+            || type==MenuAction.GAME_OBJECT_FIFTH_OPTION || type==MenuAction.EXAMINE_OBJECT
+            || type==MenuAction.ITEM_USE_ON_GAME_OBJECT || type==MenuAction.WIDGET_TARGET_ON_GAME_OBJECT;
     }
     private void draw(Graphics2D g,Menu menu)
     {

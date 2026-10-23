@@ -33,7 +33,7 @@ public class PluginLifecycleTest
         doAnswer(i -> { ((Runnable)i.getArgument(0)).run(); return null; }).when(thread).invokeLater(any(Runnable.class));
         Injector injector=Guice.createInjector(new AbstractModule() { protected void configure() {
             bind(net.runelite.client.chat.ChatMessageManager.class).toInstance(mock(net.runelite.client.chat.ChatMessageManager.class));
-            bind(Client.class).toInstance(client); bind(ClientThread.class).toInstance(thread); bind(ImprovedMenusConfig.class).toInstance(config);
+            bind(net.runelite.client.config.RuneLiteConfig.class).toInstance(mock(net.runelite.client.config.RuneLiteConfig.class)); bind(Client.class).toInstance(client); bind(ClientThread.class).toInstance(thread); bind(ImprovedMenusConfig.class).toInstance(config);
             bind(net.runelite.client.game.SpriteManager.class).toInstance(mock(net.runelite.client.game.SpriteManager.class)); bind(java.util.concurrent.ScheduledExecutorService.class).toInstance(mock(java.util.concurrent.ScheduledExecutorService.class)); bind(ItemIcons.class).toInstance(library); bind(ConfigManager.class).toInstance(manager); bind(Gson.class).toInstance(new Gson()); bind(EventBus.class).toInstance(bus);
             bind(MouseManager.class).toInstance(mouse); bind(ClientToolbar.class).toInstance(toolbar); bind(OverlayManager.class).toInstance(overlays);
             bind(ChatIconManager.class).toInstance(icons); bind(ItemManager.class).toInstance(mock(ItemManager.class)); bind(TooltipManager.class).toInstance(mock(TooltipManager.class));

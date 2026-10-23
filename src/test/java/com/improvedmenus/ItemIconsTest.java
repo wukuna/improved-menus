@@ -71,7 +71,7 @@ public class ItemIconsTest
         ImprovedMenusConfig config=mock(ImprovedMenusConfig.class); when(config.groundIcons()).thenReturn(true); when(config.groundIconSource()).thenReturn(source);
         net.runelite.client.game.ChatIconManager icons=mock(net.runelite.client.game.ChatIconManager.class); when(icons.registerChatIcon(any())).thenReturn(2); when(icons.chatIconIndex(2)).thenReturn(4);
         MenuPresentation p=com.google.inject.Guice.createInjector(new com.google.inject.AbstractModule(){ protected void configure(){
-            bind(Client.class).toInstance(mock(Client.class)); bind(ImprovedMenusConfig.class).toInstance(config); bind(net.runelite.client.game.ChatIconManager.class).toInstance(icons);
+            bind(net.runelite.client.config.RuneLiteConfig.class).toInstance(mock(net.runelite.client.config.RuneLiteConfig.class)); bind(Client.class).toInstance(mock(Client.class)); bind(ImprovedMenusConfig.class).toInstance(config); bind(net.runelite.client.game.ChatIconManager.class).toInstance(icons);
             bind(net.runelite.client.game.ItemManager.class).toInstance(mock(net.runelite.client.game.ItemManager.class)); bind(net.runelite.client.ui.overlay.tooltip.TooltipManager.class).toInstance(mock(net.runelite.client.ui.overlay.tooltip.TooltipManager.class));
         }}).getInstance(MenuPresentation.class); p.start(); return p;
     }
