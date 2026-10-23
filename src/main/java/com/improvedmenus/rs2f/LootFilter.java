@@ -4,7 +4,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import com.improvedmenus.rs2f.lang.*;
 import com.improvedmenus.rs2f.model.*;
-/** RS2F icon-only evaluator: apply merges icon values; rule/if stop on first match. */
+/** RS2F display evaluator: apply merges values; rule/if stop on first match. */
 public final class LootFilter {
  public final List<FilterRule> rules;
  private LootFilter(List<FilterRule> rules) { this.rules=Collections.unmodifiableList(new ArrayList<>(rules)); }
@@ -20,8 +20,20 @@ public final class LootFilter {
   public LootFilter build() { return new LootFilter(rules); }
  }
  public BufferedImageProvider find(ItemFacts item) {
+  return resolve(item,false).visibleIcon();
+ }
+ @lombok.Value public static class Resolved {
+  BufferedImageProvider icon;
+  boolean hidden, hideOverlay;
+  int menuSort;
+  java.awt.Color menuColor;
+  public BufferedImageProvider visibleIcon() { return hidden || hideOverlay ? null : icon; }
+ }
+ public Resolved resolve(ItemFacts item, boolean compactDefault) {
   BufferedImageProvider icon=null;
-  boolean hidden=false, hideOverlay=false, compact=false;
+  boolean hidden=false, hideOverlay=false, compact=compactDefault;
+  java.awt.Color text=java.awt.Color.WHITE, menu=null;
+  int sort=0;
   for(FilterRule r:rules) {
    if(!r.getCond().test(null,item)) continue;
    DisplayConfig display=r.getDisplay();
@@ -29,10 +41,14 @@ public final class LootFilter {
    if(display.getHidden()!=null) hidden=display.getHidden();
    if(display.getHideOverlay()!=null) hideOverlay=display.getHideOverlay();
    if(display.getCompact()!=null) compact=display.getCompact();
+   if(display.getTextColor()!=null) text=display.getTextColor();
+   if(display.getMenuTextColor()!=null) menu=display.getMenuTextColor();
+   if(display.getMenuSort()!=null) sort=display.getMenuSort();
    if(r.isTerminal()) break;
   }
-  if(hidden || hideOverlay) return null;
-  return compact ? new BufferedImageProvider.CurrentItem() : icon;
+  java.awt.Color color=hidden ? new java.awt.Color(0xff9040) : menu!=null ? menu
+   : !java.awt.Color.WHITE.equals(text) ? text : new java.awt.Color(0xff9040);
+  return new Resolved(compact ? new BufferedImageProvider.CurrentItem() : icon,hidden,hidden || hideOverlay,sort,color);
  }
  public Set<String> files() {
   Set<String> names=new LinkedHashSet<>();

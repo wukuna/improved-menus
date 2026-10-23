@@ -36,12 +36,15 @@ public class ImprovedMenusPlugin extends Plugin
     @Inject private MenuPresentation presentation;
     @Inject private OptionCountOverlay optionCounts;
     @Inject private ItemIcons itemIcons;
+    @Inject private LootFiltersCompatibility lootCompatibility;
+    @Inject private LootFiltersMenuPresentation lootMenu;
     private ImprovedMenusPanel panel;
     private NavigationButton navigation;
     private volatile boolean active;
     private Menu colorEditorMenu;
     private MenuEntry colorEditorEntry;
     private Menu colorEditorSubmenu;
+    private long lootRevision;
 
     @Provides ImprovedMenusConfig provideConfig(ConfigManager manager) { return manager.getConfig(ImprovedMenusConfig.class); }
     @Override protected void startUp()
@@ -50,7 +53,7 @@ public class ImprovedMenusPlugin extends Plugin
         presentation.setItemIcons(itemIcons);
         if(itemIcons.filters!=null) { itemIcons.filters.reload(); }
         renameNotice.startUp();
-        clientThread.invokeLater(() -> { if (active) { engine.reload(); } });
+        clientThread.invokeLater(() -> { if (active) { engine.reload(); lootCompatibility.refresh(); } });
         buttons.startUp(); eventBus.register(buttons); overlays.add(presentation); overlays.add(optionCounts); presentation.start();
         SwingUtilities.invokeLater(this::updateSidePanel);
     }
@@ -59,7 +62,7 @@ public class ImprovedMenusPlugin extends Plugin
         active=false;
         renameNotice.shutDown();
         eventBus.unregister(buttons); buttons.shutDown(); overlays.remove(presentation); overlays.remove(optionCounts);
-        clientThread.invoke(() -> { removeColorEditor(); presentation.stop(); engine.clear(); }); store.clearHistory();
+        clientThread.invoke(() -> { removeColorEditor(); presentation.stop(); lootMenu.stop(); lootCompatibility.reset(); engine.clear(); }); store.clearHistory();
         SwingUtilities.invokeLater(() -> {
             if (panel != null) { panel.stop(); panel=null; }
             if (navigation != null) { toolbar.removeNavigation(navigation); navigation=null; }
@@ -69,9 +72,22 @@ public class ImprovedMenusPlugin extends Plugin
     { if (!client.isMenuOpen()) { engine.apply(client.getMenu()); } }
     @Subscribe(priority=-1) public void onClientTick(ClientTick event)
     { if (client.getGameState() == GameState.LOGGED_IN && !client.isMenuOpen()) { engine.applyTargetProtections(client.getMenu()); } }
+    @Subscribe public void onGameTick(GameTick event)
+    {
+        if (!active) return;
+        lootCompatibility.refresh();
+        long revision=lootCompatibility.revision();
+        if (revision!=lootRevision)
+        {
+            lootRevision=revision;
+            if (client.isMenuOpen()) decorateMenu();
+        }
+    }
     @Subscribe(priority=-2) public void onMenuOpened(MenuOpened event)
     {
-        engine.applyOpened(client.getMenu()); presentation.decorate(client.getMenu());
+        presentation.stop(); lootMenu.stop();
+        engine.applyOpened(client.getMenu());
+        decorateMenu();
         if (config.colorPicker() && client.isKeyPressed(KeyCode.KC_SHIFT)) { addColorEditor(client.getMenu()); }
     }
     @Subscribe public void onConfigChanged(ConfigChanged event)
@@ -79,11 +95,27 @@ public class ImprovedMenusPlugin extends Plugin
         if (ImprovedMenusConfig.GROUP.equals(event.getGroup()))
         {
             if(itemIcons.filters!=null && (event.getKey().equals(FilterIcons.KEY) || event.getKey().equals(FilterIcons.BACKUP))) { itemIcons.filters.reload(); }
-            clientThread.invokeLater(() -> { if (active) { if (!config.groundIcons()) { presentation.stop(); } engine.reload(); } });
+            clientThread.invokeLater(() -> { if (active) { presentation.stop(); lootMenu.stop(); lootCompatibility.reset(); lootCompatibility.refresh(); engine.reload(); if(client.isMenuOpen()) decorateMenu(); } });
             if (event.getKey().equals("hideSidePanel")) { SwingUtilities.invokeLater(this::updateSidePanel); }
         }
+        else if (LocalFilterSettings.GROUP.equals(event.getGroup())) refreshLootFilter();
     }
-    @Subscribe public void onProfileChanged(net.runelite.client.events.ProfileChanged event) { if(itemIcons.filters!=null) { itemIcons.filters.reload(); } }
+    @Subscribe public void onProfileChanged(net.runelite.client.events.ProfileChanged event) { refreshLootFilter(); if(itemIcons.filters!=null) { itemIcons.filters.reload(); } }
+    @Subscribe public void onPluginChanged(net.runelite.client.events.PluginChanged event)
+    { if ("Loot Filters".equals(event.getPlugin().getName())) refreshLootFilter(); }
+    private void refreshLootFilter()
+    {
+        clientThread.invokeLater(() -> {
+            if (!active) return;
+            presentation.stop(); lootMenu.stop(); lootCompatibility.reset(); lootCompatibility.refresh();
+            if (client.isMenuOpen()) decorateMenu();
+        });
+    }
+    private void decorateMenu() {
+        lootCompatibility.beginMenu();
+        try { lootMenu.apply(client.getMenu()); presentation.decorate(client.getMenu()); }
+        finally { lootCompatibility.endMenu(); }
+    }
     @Subscribe public void onBeforeMenuRender(BeforeMenuRender event)
     { if (active && client.isMenuOpen()) { engine.highlightHovered(client.getMenu()); } }
     private void updateSidePanel()
@@ -95,8 +127,7 @@ public class ImprovedMenusPlugin extends Plugin
         }
         else if (navigation == null)
         {
-            panel=new ImprovedMenusPanel(store,engine,this::openSettings);
-            panel.addIconControls(itemIcons);
+            panel=new ImprovedMenusPanel(store,engine,this::openSettings,lootCompatibility::status);
             navigation=NavigationButton.builder().tooltip("Improved Right-Clicks").icon(icon()).priority(6).panel(panel).build();
             toolbar.addNavigation(navigation);
         }
@@ -112,7 +143,7 @@ public class ImprovedMenusPlugin extends Plugin
     }
     @Subscribe public void onGameStateChanged(GameStateChanged event)
     {
-        if (event.getGameState() != GameState.LOGGED_IN) { buttons.reset(); engine.clear(); }
+        if (event.getGameState() != GameState.LOGGED_IN) { presentation.stop(); lootMenu.stop(); lootCompatibility.reset(); buttons.reset(); engine.clear(); }
         else { renameNotice.showIfLoggedIn(); }
     }
     @Subscribe public void onFocusChanged(FocusChanged event) { if (!event.isFocused()) { clientThread.invoke(buttons::reset); } }

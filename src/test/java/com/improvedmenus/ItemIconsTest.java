@@ -94,6 +94,25 @@ public class ItemIconsTest
             p.stop(); assertEquals("Shark",entry.getTarget());
         }
     }
+    @Test public void linkedIconsRespectAllSourcesAndKeepColorsSeparate()
+    {
+        for (ImprovedMenusConfig.GroundIconSource source : ImprovedMenusConfig.GroundIconSource.values()) for(boolean respect:new boolean[]{false,true})
+        {
+            LootFiltersCompatibility bridge=mock(LootFiltersCompatibility.class);
+            when(bridge.findIcon(any())).thenReturn(new LootFiltersCompatibility.Result(new java.awt.image.BufferedImage(16,16,2),false));
+            MenuPresentation p=presentation(source,mock(Client.class),mock(net.runelite.client.game.ItemManager.class),true,bridge,respect);
+            MenuEntry entry=UserCombinationAuditTest.e("Take","<col=ff0000>Shark</col>",MenuAction.GROUND_ITEM_THIRD_OPTION,385,0);
+            p.decorate(UserCombinationAuditTest.menu(entry));
+            String slots=source==ImprovedMenusConfig.GroundIconSource.BOTH ? "<img=4><img=4>" : "<img=4>";
+            assertEquals(slots+"<col=ff0000>Shark</col>",entry.getTarget());
+            if(source==ImprovedMenusConfig.GroundIconSource.NATIVE) verifyNoInteractions(bridge);
+            else verify(bridge).findIcon(entry);
+            p.stop(); assertEquals("<col=ff0000>Shark</col>",entry.getTarget());
+            when(bridge.findIcon(any())).thenReturn(new LootFiltersCompatibility.Result(null,false,true,true,0,java.awt.Color.RED));
+            p.decorate(UserCombinationAuditTest.menu(entry)); assertEquals(source==ImprovedMenusConfig.GroundIconSource.CUSTOM || source==ImprovedMenusConfig.GroundIconSource.BOTH && respect ? "<col=ff0000>Shark</col>" : "<img=4><col=ff0000>Shark</col>",entry.getTarget());
+            p.stop();
+        }
+    }
     @Test public void respectingFilterVisibilityInBothIsOptionalAndKeepsVisiblePairs() {
         assertFalse(new ImprovedMenusConfig() {}.bothRespectFilterVisibility());
         assertTrue(SettingsCatalog.ALL.containsKey("bothRespectFilterVisibility"));
@@ -111,13 +130,21 @@ public class ItemIconsTest
     {
         return presentation(source,mock(Client.class),mock(net.runelite.client.game.ItemManager.class));
     }
-    private MenuPresentation presentation(ImprovedMenusConfig.GroundIconSource source,Client client,net.runelite.client.game.ItemManager itemManager)
-    { return presentation(source,client,itemManager,false); }
     private MenuPresentation presentation(ImprovedMenusConfig.GroundIconSource source,Client client,net.runelite.client.game.ItemManager itemManager,boolean respect)
+    { return presentation(source,client,itemManager,false,mock(LootFiltersCompatibility.class),respect); }
+    private MenuPresentation presentation(ImprovedMenusConfig.GroundIconSource source,boolean linked,LootFiltersCompatibility bridge)
+    { return presentation(source,mock(Client.class),mock(net.runelite.client.game.ItemManager.class),linked,bridge); }
+    private MenuPresentation presentation(ImprovedMenusConfig.GroundIconSource source,Client client,net.runelite.client.game.ItemManager itemManager)
+    { return presentation(source,client,itemManager,false,mock(LootFiltersCompatibility.class)); }
+    private MenuPresentation presentation(ImprovedMenusConfig.GroundIconSource source,Client client,net.runelite.client.game.ItemManager itemManager,boolean linked,LootFiltersCompatibility bridge)
+    { return presentation(source,client,itemManager,linked,bridge,false); }
+    private MenuPresentation presentation(ImprovedMenusConfig.GroundIconSource source,Client client,net.runelite.client.game.ItemManager itemManager,boolean linked,LootFiltersCompatibility bridge,boolean respect)
     {
-        ImprovedMenusConfig config=mock(ImprovedMenusConfig.class); when(config.groundIcons()).thenReturn(true); when(config.groundIconSource()).thenReturn(source); when(config.bothRespectFilterVisibility()).thenReturn(respect);
+        ImprovedMenusConfig config=mock(ImprovedMenusConfig.class); when(config.groundIcons()).thenReturn(true); when(config.groundIconSource()).thenReturn(source); when(config.lootFiltersCompatibility()).thenReturn(linked); when(config.bothRespectFilterVisibility()).thenReturn(respect);
         net.runelite.client.game.ChatIconManager icons=mock(net.runelite.client.game.ChatIconManager.class); when(icons.registerChatIcon(any())).thenReturn(2); when(icons.chatIconIndex(2)).thenReturn(4);
         MenuPresentation p=com.google.inject.Guice.createInjector(new com.google.inject.AbstractModule(){ protected void configure(){
+            bind(LootFiltersCompatibility.class).toInstance(bridge);
+            bind(java.util.concurrent.ScheduledExecutorService.class).toInstance(mock(java.util.concurrent.ScheduledExecutorService.class));
             bind(net.runelite.client.config.RuneLiteConfig.class).toInstance(mock(net.runelite.client.config.RuneLiteConfig.class)); bind(Client.class).toInstance(client); bind(ImprovedMenusConfig.class).toInstance(config); bind(net.runelite.client.game.ChatIconManager.class).toInstance(icons);
             bind(net.runelite.client.game.ItemManager.class).toInstance(itemManager); bind(net.runelite.client.ui.overlay.tooltip.TooltipManager.class).toInstance(mock(net.runelite.client.ui.overlay.tooltip.TooltipManager.class));
         }}).getInstance(MenuPresentation.class); p.start(); return p;

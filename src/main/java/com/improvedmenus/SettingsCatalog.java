@@ -51,6 +51,9 @@ final class SettingsCatalog
         add("report", "Report", "Buttons", "NORMAL", "NORMAL", "LEFT_CLICK_OFF", "DISABLED");
         bool("deprioritizeLeftClickOffEntries", "Deprioritize protected buttons", "Buttons", true);
         bool("groundIcons", "Ground loot icons", "Presentation", false);
+        bool("lootFiltersCompatibility", "Loot Filters compatibility", "Presentation", false);
+        bool("useLootFiltersInMenu", "Use Loot Filters in menu", "Presentation", false);
+        bool("lootFiltersMenuColors", "Use Loot Filters menu colors", "Colors", false);
         add("groundIconSource", "Icon source", "Presentation", "NATIVE", "NATIVE", "CUSTOM", "BOTH");
         bool("bothRespectFilterVisibility", "Both: respect filter visibility", "Presentation", false);
         bool("optionCount", "Additional option count", "Presentation", false);

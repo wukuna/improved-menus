@@ -98,3 +98,8 @@ commit=0c1c5cf2a8588ac3b017e7026c393d2eee4980c3
 repository=https://github.com/Unmoon/tool-required.git
 commit=031e4986c2235f58888cf158666a02f3497cac60
 ```
+
+
+## Loot Filters local compatibility
+
+The RS2F parser, condition semantics, preamble, highlighted/hidden item-list behavior and three bundled default filters are adapted from riktenx/loot-filters at 993fd054e08d42a77d3415acbb9ac7c2797726ed. The complete BSD 2-Clause license is distributed at src/main/resources/com/improvedmenus/loot-filters-LICENSE.txt. Defaults retain the Rikten, Joe and Storn names. Our independent loader reads selected local data without changing Loot Filters files or settings. No upstream classes are packaged or required at runtime.
