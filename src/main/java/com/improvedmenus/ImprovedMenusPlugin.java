@@ -50,7 +50,6 @@ public class ImprovedMenusPlugin extends Plugin
     {
         active=true;
         presentation.setItemIcons(itemIcons);
-        eventBus.register(lootCompatibility);
         if(itemIcons.filters!=null) { itemIcons.filters.reload(); }
         renameNotice.startUp();
         clientThread.invokeLater(() -> { if (active) { engine.reload(); } });
@@ -61,7 +60,6 @@ public class ImprovedMenusPlugin extends Plugin
     {
         active=false;
         renameNotice.shutDown();
-        eventBus.unregister(lootCompatibility);
         eventBus.unregister(buttons); buttons.shutDown(); overlays.remove(presentation); overlays.remove(optionCounts);
         clientThread.invoke(() -> { removeColorEditor(); presentation.stop(); lootMenu.stop(); lootCompatibility.reset(); engine.clear(); }); store.clearHistory();
         SwingUtilities.invokeLater(() -> {

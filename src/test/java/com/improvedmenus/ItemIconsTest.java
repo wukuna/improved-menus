@@ -108,7 +108,7 @@ public class ItemIconsTest
             if(source==ImprovedMenusConfig.GroundIconSource.NATIVE) verifyNoInteractions(bridge);
             else verify(bridge).find(entry);
             p.stop(); assertEquals("<col=ff0000>Shark</col>",entry.getTarget());
-            when(bridge.find(any())).thenReturn(new LootFiltersCompatibility.Result(null,false,true,true,0,false,java.awt.Color.RED));
+            when(bridge.find(any())).thenReturn(new LootFiltersCompatibility.Result(null,false,true,true,0,java.awt.Color.RED));
             p.decorate(UserCombinationAuditTest.menu(entry)); assertEquals(source==ImprovedMenusConfig.GroundIconSource.CUSTOM || source==ImprovedMenusConfig.GroundIconSource.BOTH && respect ? "<col=ff0000>Shark</col>" : "<img=4><col=ff0000>Shark</col>",entry.getTarget());
             p.stop();
         }

@@ -14,8 +14,8 @@ public class LootFiltersMenuPresentationTest {
     }).getInstance(LootFiltersMenuPresentation.class);
     private MenuEntry take(String name,int id,int sort,boolean hidden) {
         MenuEntry entry=TestMenus.entry("<col=00ff00>Take</col>","<col=ff0000>"+name+"</col>",MenuAction.GROUND_ITEM_THIRD_OPTION,id,0);
-        when(entry.getIdentifier()).thenReturn(id);
-        when(compatibility.find(entry)).thenReturn(new LootFiltersCompatibility.Result(null,false,hidden,hidden,sort,hidden,Color.CYAN));
+        when(entry.getIdentifier()).thenReturn(id); when(entry.isDeprioritized()).thenReturn(hidden);
+        when(compatibility.find(entry)).thenReturn(new LootFiltersCompatibility.Result(null,false,hidden,hidden,sort,Color.CYAN));
         return entry;
     }
     @Test public void defaultsAndDisabledIntegrationLeaveMenuUntouched() {
@@ -52,6 +52,15 @@ public class LootFiltersMenuPresentationTest {
         assertEquals("<col=00ffff><img=5>Shark (2)</col>",item.getTarget()); assertEquals("<col=00ff00>Take</col>",item.getOption());
         presentation.stop(); assertEquals("<img=5><col=ff0000>Shark (2)</col>",item.getTarget());
         presentation.apply(menu); item.setTarget("Other plugin edit"); presentation.stop(); assertEquals("Other plugin edit",item.getTarget());
+    }
+    @Test public void hiddenRowsKeepExistingColorAndPriorityEvenWhenColorsAreEnabled() {
+        when(config.useLootFiltersInMenu()).thenReturn(true); when(config.lootFiltersMenuColors()).thenReturn(true);
+        MenuEntry hidden=take("Hidden",3,5,true), visible=take("Visible",4,1,false);
+        when(hidden.isDeprioritized()).thenReturn(false);
+        Menu menu=TestMenus.menu(hidden,visible); presentation.apply(menu);
+        assertArrayEquals(new MenuEntry[]{visible,hidden},menu.getMenuEntries());
+        assertEquals("<col=ff0000>Hidden</col>",hidden.getTarget());
+        verify(hidden,never()).setDeprioritized(anyBoolean());
     }
     @Test public void cleanupDoesNotUndoOtherPluginOrderingOrReusedEntryIdentity() {
         when(config.useLootFiltersInMenu()).thenReturn(true); when(config.lootFiltersMenuColors()).thenReturn(true);

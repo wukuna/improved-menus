@@ -117,11 +117,11 @@ The RS2F lexer, preprocessor, parser, condition classes and preamble are adapted
 
 Enable **Loot Filters compatibility** directly above **Icon source**, then choose **Custom** or **Both**. A supporting Loot Filters version supplies its selected icons, including custom images, to Take menus automatically. Native uses ordinary item pictures. Colors remain controlled separately. No script or image upload is required for the connection.
 
-Until the proposed Loot Filters message API is released, the connection supplies no custom icon. Custom leaves the row undecorated; Both retains its native icon. Existing saved assignments and imported backups remain intact; turn compatibility off to use the existing imported rules. Manual item assignments continue to take priority. The side panel reports whether Loot Filters responded after opening a Take menu.
+Until a supporting Loot Filters version is released, the connection supplies no custom icon. Custom leaves the row undecorated; Both retains its native icon. Existing saved assignments and imported backups remain intact; turn compatibility off to use the existing imported rules. Manual item assignments continue to take priority. The side panel reports whether Loot Filters responded after opening a Take menu.
 
-**Use Loot Filters in menu** is a separate, optional setting under Presentation. It uses the provider's resolved ordering and hidden-item priority for Take rows in opened menus. It keeps every action available and leaves non-loot rows in their existing positions. It does not change normal left-click behavior, saved menu rules, or icon selection. Hidden ground overlays are not treated as instructions to delete Take actions.
+**Use Loot Filters in menu** is a separate, optional setting under Presentation. It uses the provider's resolved ordering while retaining the menu's existing hidden-item priority for Take rows in opened menus. It keeps every action available and leaves non-loot rows in their existing positions. It does not change normal left-click behavior, saved menu rules, or icon selection. Hidden ground overlays are not treated as instructions to delete Take actions.
 
-**Use Loot Filters menu colors**, under Colors, additionally applies the provider's resolved item-name color when **Use Loot Filters in menu** is on. Your action-color rules stay separate. Both new switches default off. They are included in settings profiles, import/export and undo.
+**Use Loot Filters menu colors**, under Colors, additionally applies the provider's resolved item-name color when **Use Loot Filters in menu** is on. Hidden-row colors stay as Loot Filters sets them. Your action-color rules stay separate. Both new switches default off. They are included in settings profiles, import/export and undo.
 
 | Settings | Result |
 | --- | --- |
@@ -132,7 +132,7 @@ Until the proposed Loot Filters message API is released, the connection supplies
 | Icon source Custom / Both with compatibility on | Resolved Loot Filters icons; existing manual overrides and Both visibility option remain in effect |
 | Provider unavailable or conflicting stacks | No extra menu changes; existing Custom/Both fallback behavior |
 
-The connection uses the proposed `resolved-display-request-v1` / `resolved-display-response-v1` protocol. It requests already evaluated settings when opening a menu, including cached custom images; it does not read another plugin's files or re-evaluate its scripts. No sounds or ground overlays are created by this integration. Loot Filters' own menu changes continue to be controlled by that plugin.
+The connection sends `resolved-display-request-v1` with item coordinates and reads the resolved display from the same message after dispatch. It requests already evaluated settings when opening a menu, including cached custom images; it does not read another plugin's files or re-evaluate its scripts. No sounds or ground overlays are created by this integration. Loot Filters' own menu changes continue to be controlled by that plugin.
 
 ### Additional option indicator
 

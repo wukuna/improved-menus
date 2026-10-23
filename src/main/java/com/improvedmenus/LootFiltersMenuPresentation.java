@@ -32,7 +32,8 @@ final class LootFiltersMenuPresentation {
             LootFiltersCompatibility.Result display=compatibility.find(entry);
             if(display==null) continue;
             slots.add(i); rows.add(new Ranked(entry,display));
-            if(config.lootFiltersMenuColors() && display.menuColor!=null) {
+            // Hidden-row recoloring belongs to Loot Filters' own preference, not DisplayConfig.
+            if(config.lootFiltersMenuColors() && !display.hidden && display.menuColor!=null) {
                 String before=entry.getTarget();
                 String after=String.format("<col=%06x>",display.menuColor.getRGB() & 0xffffff)
                     + before.replaceAll("</?col(?:=[^>]*)?>", "") + "</col>";
@@ -81,7 +82,7 @@ final class LootFiltersMenuPresentation {
         final int sort;
         final boolean deprioritized;
         Ranked(MenuEntry entry,LootFiltersCompatibility.Result display) {
-            this.entry=entry; sort=display.menuSort; deprioritized=entry.isDeprioritized() || display.deprioritized;
+            this.entry=entry; sort=display.menuSort; deprioritized=entry.isDeprioritized();
         }
     }
     private static final class TargetEdit {
