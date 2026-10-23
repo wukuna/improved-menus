@@ -6,13 +6,7 @@ Protection switches start off. Enable the features you want in RuneLite's Improv
 
 Previously **Menu Workshop**. The name change keeps your existing settings and profiles. A one-time chatbox notice explains the rename after login.
 
-## Getting started
-
-1. Open **Improved Right-Clicks** in RuneLite's plugin settings and enable the protections or presentation options you want.
-2. Use the side panel for profiles, imports, custom icon setup and diagnostics.
-3. Hold the configured reveal modifier before opening a menu to temporarily show options this plugin hid.
-
-**Release status:** the latest icon-visibility and indicator refinements are in [Plugin Hub update #19222](https://github.com/runelite/plugin-hub/pull/19222). The [submitted source](https://github.com/wukuna/improved-right-clicks/tree/41fe164bb11d7c034ef514d55d5aa9caf9dd4ab8) contains those changes; Hub availability depends on that update being accepted.
+[Features](#features) · [Getting started](#getting-started) · [Usage](#usage) · [Saved settings](#saved-settings) · [Compatibility](#compatibility) · [Related plugins and sources](#related-plugins-and-sources) · [Development](#development) · [Support](#support) · [License and attribution](#license-and-attribution)
 
 ## Features
 
@@ -32,7 +26,17 @@ Protection switches start off. Enable the features you want in RuneLite's Improv
 
 Enable **Hide side panel** under General to remove the Improved Right-Clicks toolbar button. Menu features and the Shift-menu color editor remain active. Turn it off to access profiles, import/export, undo and diagnostics again.
 
-## Item rules and exceptions
+## Getting started
+
+1. Open **Improved Right-Clicks** in RuneLite's plugin settings and enable the protections or presentation options you want.
+2. Use the side panel for profiles, imports, custom icon setup and diagnostics.
+3. Hold the configured reveal modifier before opening a menu to temporarily show options this plugin hid.
+
+**Release status:** the latest icon-visibility and indicator refinements are in [Plugin Hub update #19222](https://github.com/runelite/plugin-hub/pull/19222). The [submitted source](https://github.com/wukuna/improved-right-clicks/tree/41fe164bb11d7c034ef514d55d5aa9caf9dd4ab8) contains those changes; Hub availability depends on that update being accepted.
+
+## Usage
+
+### Item rules and exceptions
 
 Use one `action,item name` rule per line. Matching ignores case and formatting tags. `*` matches any text; other characters are literal. Lines starting with `#` are comments.
 
@@ -65,42 +69,6 @@ Exact color mappings take precedence over wildcard mappings. Hold Shift when ope
 
 The editor accepts at most 200 rules per field. Invalid manual configuration edits disable that rule field rather than retaining old invisible rules. Profile imports validate every setting before applying changes. Imports cannot modify other plugins' settings. Existing-setting import reads explicitly saved settings from the supported plugins listed below and leaves those originals intact. Missing settings and source-plugin enablement are not inferred.
 
-## Other mods / sources
-
-This project combines features from, and credits, these plugins. Links identify the source versions reviewed for this release. Adapted code/catalogs and complete licenses are listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and distributed with the plugin.
-
-| Source plugin | Features included |
-|---|---|
-| [No Examine](https://github.com/Skretzo/runelite-plugins/tree/ea506dbbfd2aa70dd024f2fc7b761786e2ced91a) | Category-specific Examine removal, keeping lone Examine, right-click Cancel/Walk here/Set heading cleanup |
-| [Not Empty](https://github.com/dekvall/runelite-external-plugins/tree/0c1c5cf2a8588ac3b017e7026c393d2eee4980c3) | Dosed-item Empty protection |
-| [No Misclicks In Bank](https://github.com/Welkon1/No-Misclicks-In-Bank/tree/6f76aa102a04525bdce2424b57b4ad899ba82e8b) | Independent Wield, Wear, Drink and Eat bank guards |
-| [Item Option Hider](https://github.com/kekingbd/item-option-hider/tree/5375d699a8661c157c7e26b699a9c46401237c7e) | Item action/name rules, wildcards and item-on-item targets |
-| [Menu Colorizer](https://github.com/dgalambos/menu-colorizer/tree/3e73b989615aecb2813f0b74bb9ecdf5ba5451ac) | Cosmetic action colors, interactive picker/reset and submenus |
-| [Tool Required](https://github.com/Unmoon/tool-required/tree/031e4986c2235f58888cf158666a02f3497cac60) | Axe/pickaxe requirements and tool catalog |
-| [Home Improvement](https://github.com/Mike-U5/rl-plugin-home-improvement/tree/6b7cca56d95d794bae252f5f7b58b8d2d5f6027e) | House building-mode cleanup and Mahogany Homes catalog |
-| [Misclick Guard](https://github.com/willzero123/misclick-guard/tree/a49e33e7576dbf60ec3caa39be4f470b6be71f47) | Button matching, click-origin protection and Cancel fallback |
-| [Ground Loot Icons](https://github.com/Fiffers/ground-loot-icons/tree/8e3e529f27aef3b7a5323ef8fef4f565d8b00be2) | Take-menu item icons and row geometry |
-| [Mouseover Options+](https://github.com/Petzep/mouseover-options/tree/872f6bf6a0817e5d6292749c2f3d4ae8a8eb9600) | Additional-option counts, minimum threshold, Examine/widget switches and text color |
-| [No Use Player](https://github.com/oohwooh/no-use-players/tree/e76b5612cea2f9fe68b0ba6cecd2bf11b1a5d656) | Item-only player-use protection and default allowed items |
-| [Don't Telegrab NPCs](https://github.com/ldavid432/dont-telekinetic-grab-npcs/tree/71b6675364d67a65eb0023667c42863eeb0e3ea7) | Telegrab-specific NPC protection and useful-target catalog |
-
-Users of the features in this table can consolidate them here after checking their settings. This is feature coverage, not a claim that every setting in each source plugin has been reproduced. Cancel/Walk/Set-heading cleanup applies only to opened menus. Option counts use a standard hover tooltip rather than Mouseover Options+'s custom badge layout. Useful Telegrab targets are always allowed rather than individually switchable. Hold-to-reveal is shared rather than Examine-only. Mahogany Homes cleanup preserves non-Remove actions.
-
-Keep RuneLite's Menu Entry Swapper for swaps and specialist plugins for their remaining features. Disable overlapping filters/colors before comparing results: this plugin cannot reveal options another plugin has removed.
-
-Menu Entry Swapper's Shift-right-click customization remains available with Examine hiding and menu colors enabled. Improved Right-Clicks keeps its native Examine lookup entries unchanged while building that menu, then applies the configured cleanup after the swap controls have been added.
-
-## Development
-
-Java 11 is used for the build. Run `gradlew.bat test` for automated checks or `gradlew.bat run` to launch the development client. Tests cover filtering boundaries, order/callback preservation, contexts, profiles/import validation, click origin, tooltip ownership, reveal and cosmetic restoration. See the build configuration and third-party notices for dependencies and licensing.
-
-A short live smoke check is still needed for real menu rendering: try a dosed potion and bank item, one protected button through both click paths, a tree with/without an axe, a house menu outside/inside building mode, a colored submenu, and ground loot icons. Disable/re-enable once while a menu is open. Extensive repeated testing is not required, but automated checks do not verify actual in-game rendering.
-
-Ground loot icons decorate the main right-click menu only. Submenus keep their original target text because RuneLite does not expose whether a submenu is open for reliable icon positioning. Reopening a menu and disabling icons restore the target text owned by Improved Right-Clicks.
-
-Tool guards leave the knife-cut Temple Trekking swamp vines and quest Cave entrance interactions available. Ordinary axe and pickaxe protections remain independent.
-
-
 ### Custom ground-menu icons
 
 Enable ground-loot menu icons and select **Native**, **Custom**, or **Both** in the normal plugin settings. Open **Ground loot menu icons** in the side panel to import a filter or manage custom icons. Native shows item pictures; Custom shows imported or manually assigned icons; Both shows custom and item pictures together. Custom leaves items without a visible assigned icon undecorated; it never substitutes a native icon for a missing custom image. Both retains the native item picture when no custom icon is visible. Imported filters honor the final `hidden` and `hideOverlay` values after matching rule overrides. Manually assigned item icons take priority over imported filter rules. Both avoids duplicating Current Item or the same item ID. Menu colors stay separate.
@@ -127,6 +95,53 @@ Under Presentation, **Hide player option counts** excludes player actions while 
 
 **Option count anchor** offers Below left (the existing default), Below right, Above left and Above right relative to the tooltip stack. RuneLite still controls the stack position relative to the cursor. All options are saved in profiles and support import/export and undo.
 
+## Saved settings
+
+Settings and named profiles retain the existing `improvedmenus` storage keys. Renaming the plugin or repository does not reset them. Profiles, validated imports and the side panel's Undo tools manage plugin settings; custom icon assignments and imported filter backups have their own controls described above. Imports leave other plugins' original settings and files intact.
+
+## Compatibility
+
+Users of the features in this table can consolidate them here after checking their settings. This is feature coverage, not a claim that every setting in each source plugin has been reproduced. Cancel/Walk/Set-heading cleanup applies only to opened menus. Option counts use a standard hover tooltip rather than Mouseover Options+'s custom badge layout. Useful Telegrab targets are always allowed rather than individually switchable. Hold-to-reveal is shared rather than Examine-only. Mahogany Homes cleanup preserves non-Remove actions.
+
+Keep RuneLite's Menu Entry Swapper for swaps and specialist plugins for their remaining features. Disable overlapping filters/colors before comparing results: this plugin cannot reveal options another plugin has removed.
+
+Menu Entry Swapper's Shift-right-click customization remains available with Examine hiding and menu colors enabled. Improved Right-Clicks keeps its native Examine lookup entries unchanged while building that menu, then applies the configured cleanup after the swap controls have been added.
+
+Automatic Loot Filters integration is not part of the current public import workflow. Import the same Filterscape script manually as described under Usage. Imported icons decorate menu entries; they do not change ground labels, beams or sounds.
+
+## Related plugins and sources
+
+This project combines features from, and credits, these plugins. Links identify the source versions reviewed for this release. Adapted code/catalogs and complete licenses are listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and distributed with the plugin.
+
+| Project | Relationship | Relevant features and limits |
+| --- | --- | --- |
+| [No Examine](https://github.com/Skretzo/runelite-plugins/tree/ea506dbbfd2aa70dd024f2fc7b761786e2ced91a) | Source / feature overlap | Category-specific Examine removal, keeping lone Examine, right-click Cancel/Walk here/Set heading cleanup |
+| [Not Empty](https://github.com/dekvall/runelite-external-plugins/tree/0c1c5cf2a8588ac3b017e7026c393d2eee4980c3) | Source / feature overlap | Dosed-item Empty protection |
+| [No Misclicks In Bank](https://github.com/Welkon1/No-Misclicks-In-Bank/tree/6f76aa102a04525bdce2424b57b4ad899ba82e8b) | Source / feature overlap | Independent Wield, Wear, Drink and Eat bank guards |
+| [Item Option Hider](https://github.com/kekingbd/item-option-hider/tree/5375d699a8661c157c7e26b699a9c46401237c7e) | Source / feature overlap | Item action/name rules, wildcards and item-on-item targets |
+| [Menu Colorizer](https://github.com/dgalambos/menu-colorizer/tree/3e73b989615aecb2813f0b74bb9ecdf5ba5451ac) | Source / feature overlap | Cosmetic action colors, interactive picker/reset and submenus |
+| [Tool Required](https://github.com/Unmoon/tool-required/tree/031e4986c2235f58888cf158666a02f3497cac60) | Source / feature overlap | Axe/pickaxe requirements and tool catalog |
+| [Home Improvement](https://github.com/Mike-U5/rl-plugin-home-improvement/tree/6b7cca56d95d794bae252f5f7b58b8d2d5f6027e) | Source / feature overlap | House building-mode cleanup and Mahogany Homes catalog |
+| [Misclick Guard](https://github.com/willzero123/misclick-guard/tree/a49e33e7576dbf60ec3caa39be4f470b6be71f47) | Source / feature overlap | Button matching, click-origin protection and Cancel fallback |
+| [Ground Loot Icons](https://github.com/Fiffers/ground-loot-icons/tree/8e3e529f27aef3b7a5323ef8fef4f565d8b00be2) | Source / feature overlap | Take-menu item icons and row geometry |
+| [Mouseover Options+](https://github.com/Petzep/mouseover-options/tree/872f6bf6a0817e5d6292749c2f3d4ae8a8eb9600) | Source / feature overlap | Additional-option counts, minimum threshold, Examine/widget switches and text color |
+| [No Use Player](https://github.com/oohwooh/no-use-players/tree/e76b5612cea2f9fe68b0ba6cecd2bf11b1a5d656) | Source / feature overlap | Item-only player-use protection and default allowed items |
+| [Don't Telegrab NPCs](https://github.com/ldavid432/dont-telekinetic-grab-npcs/tree/71b6675364d67a65eb0023667c42863eeb0e3ea7) | Source / feature overlap | Telegrab-specific NPC protection and useful-target catalog |
+
+## Development
+
+Java 11 is used for the build. Run `gradlew.bat test` for automated checks or `gradlew.bat run` to launch the development client. Tests cover filtering boundaries, order/callback preservation, contexts, profiles/import validation, click origin, tooltip ownership, reveal and cosmetic restoration. See the build configuration and third-party notices for dependencies and licensing.
+
+A short live smoke check is still needed for real menu rendering: try a dosed potion and bank item, one protected button through both click paths, a tree with/without an axe, a house menu outside/inside building mode, a colored submenu, and ground loot icons. Disable/re-enable once while a menu is open. Extensive repeated testing is not required, but automated checks do not verify actual in-game rendering.
+
+Ground loot icons decorate the main right-click menu only. Submenus keep their original target text because RuneLite does not expose whether a submenu is open for reliable icon positioning. Reopening a menu and disabling icons restore the target text owned by Improved Right-Clicks.
+
+Tool guards leave the knife-cut Temple Trekking swamp vines and quest Cave entrance interactions available. Ordinary axe and pickaxe protections remain independent.
+
 ## Support
 
 [Report an issue or suggest a feature](https://github.com/wukuna/improved-right-clicks/issues). Include the affected setting, steps to reproduce, other menu plugins and a screenshot when useful. For imported icons, include a small example filter with private details removed.
+
+## License and attribution
+
+Improved Right-Clicks uses the [BSD 2-Clause license](LICENSE). Adapted projects, bundled RS2F components and their licenses are documented in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and the resource notices. Source attribution is separate from feature compatibility.
