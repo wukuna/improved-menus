@@ -41,7 +41,7 @@ class LootFiltersCompatibility {
     }
     Result request(Tile tile, int itemId) {
         pending=UUID.randomUUID().toString(); result=null;
-        status="Compatible Loot Filters not responding; using native icons.";
+        status="Compatible Loot Filters not responding; no filter icon available.";
         try {
             events.post(new PluginMessage("loot-filters","menu-icon-request-v1",
                 Map.of("requestId",pending,"tile",tile,"itemId",itemId)));
@@ -57,7 +57,7 @@ class LootFiltersCompatibility {
             result=new Result((BufferedImage)data.get("icon"),Boolean.TRUE.equals(data.get("itemIcon")));
             status="Connected to Loot Filters. Its selected icons appear in Take menus.";
         } else {
-            status="Connected to Loot Filters; no unambiguous icon for this item. Using native.";
+            status="Connected to Loot Filters; no visible, unambiguous icon available for this item.";
         }
     }
 }

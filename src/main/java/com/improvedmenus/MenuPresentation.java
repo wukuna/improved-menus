@@ -66,12 +66,13 @@ final class MenuPresentation extends Overlay
                     if(config.lootFiltersCompatibility()) { linked=lootCompatibility.find(entry); }
                     else if(itemIcons!=null && itemIcons.filters!=null) { custom=itemIcons.filters.find(entry); }
                 }
+                if((source==ImprovedMenusConfig.GroundIconSource.CUSTOM || source==ImprovedMenusConfig.GroundIconSource.BOTH && config.bothRespectFilterVisibility()) && custom==null && linked==null) { continue; }
                 boolean both=source==ImprovedMenusConfig.GroundIconSource.BOTH && custom!=null
                     && custom.kind!=ItemIcons.Kind.CURRENT_ITEM && !(custom.kind==ItemIcons.Kind.ITEM && custom.iconId==entry.getIdentifier());
                 both |= source==ImprovedMenusConfig.GroundIconSource.BOTH && linked!=null && !linked.itemIcon;
                 String decorated = marker+(both ? marker : "")+original;
                 TargetEdit edit=new TargetEdit(entry,original,decorated);
-                edit.custom=custom; edit.linked=linked==null ? null : linked.image; edit.both=both;
+                edit.nativeAllowed=source!=ImprovedMenusConfig.GroundIconSource.CUSTOM && !(source==ImprovedMenusConfig.GroundIconSource.BOTH && config.bothRespectFilterVisibility()); edit.custom=custom; edit.linked=linked==null ? null : linked.image; edit.both=both;
                 if (decorated.equals(original)) { continue; }
                 ownedTargets.put(entry,edit);
                 entry.setTarget(decorated);
@@ -127,13 +128,14 @@ final class MenuPresentation extends Overlay
             if (y < menu.getMenuY()+19 || y+15 > menu.getMenuY()+menu.getMenuHeight()) { continue; }
             int x=menu.getMenuX()+8+metrics.stringWidth(MenuRules.plain(entry.getOption())+" ");
             BufferedImage custom=edit.linked!=null ? edit.linked : edit.custom==null || itemIcons==null ? null : itemIcons.image(edit.custom,entry.getIdentifier());
-            g.drawImage(custom==null ? items.getImage(entry.getIdentifier(),Integer.MAX_VALUE,false) : custom,x,y,17,15,null);
+            if(custom!=null) { g.drawImage(custom,x,y,17,15,null); }
+            else if(edit.nativeAllowed) { g.drawImage(items.getImage(entry.getIdentifier(),Integer.MAX_VALUE,false),x,y,17,15,null); }
             if(edit.both && custom!=null) { g.drawImage(items.getImage(entry.getIdentifier(),Integer.MAX_VALUE,false),x+17,y,17,15,null); }
         }
     }
     private static final class TargetEdit
     {
-        ItemIcons.Assignment custom; BufferedImage linked; boolean both;
+        ItemIcons.Assignment custom; BufferedImage linked; boolean both, nativeAllowed;
         final String original, decorated;
         final MenuAction type;
         final int identifier, param0, param1;

@@ -53,6 +53,7 @@ final class SettingsCatalog
         bool("groundIcons", "Ground loot icons", "Presentation", false);
         bool("lootFiltersCompatibility", "Loot Filters compatibility", "Presentation", false);
         add("groundIconSource", "Icon source", "Presentation", "NATIVE", "NATIVE", "CUSTOM", "BOTH");
+        bool("bothRespectFilterVisibility", "Both: respect filter visibility", "Presentation", false);
         bool("optionCount", "Additional option count", "Presentation", false);
         add("minimumOptions", "Minimum extra options", "Presentation", "1");
         bool("countExamine", "Count Examine", "Presentation", true);
