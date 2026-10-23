@@ -34,6 +34,7 @@ public class ImprovedMenusPlugin extends Plugin
     @Inject private ClientToolbar toolbar;
     @Inject private OverlayManager overlays;
     @Inject private MenuPresentation presentation;
+    @Inject private OptionCountOverlay optionCounts;
     @Inject private ItemIcons itemIcons;
     private ImprovedMenusPanel panel;
     private NavigationButton navigation;
@@ -50,14 +51,14 @@ public class ImprovedMenusPlugin extends Plugin
         if(itemIcons.filters!=null) { itemIcons.filters.reload(); }
         renameNotice.startUp();
         clientThread.invokeLater(() -> { if (active) { engine.reload(); } });
-        buttons.startUp(); eventBus.register(buttons); overlays.add(presentation); presentation.start();
+        buttons.startUp(); eventBus.register(buttons); overlays.add(presentation); overlays.add(optionCounts); presentation.start();
         SwingUtilities.invokeLater(this::updateSidePanel);
     }
     @Override protected void shutDown()
     {
         active=false;
         renameNotice.shutDown();
-        eventBus.unregister(buttons); buttons.shutDown(); overlays.remove(presentation);
+        eventBus.unregister(buttons); buttons.shutDown(); overlays.remove(presentation); overlays.remove(optionCounts);
         clientThread.invoke(() -> { removeColorEditor(); presentation.stop(); engine.clear(); }); store.clearHistory();
         SwingUtilities.invokeLater(() -> {
             if (panel != null) { panel.stop(); panel=null; }

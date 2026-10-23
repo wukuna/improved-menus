@@ -50,18 +50,18 @@ public class PresentationTest
             bind(net.runelite.client.config.RuneLiteConfig.class).toInstance(mock(net.runelite.client.config.RuneLiteConfig.class)); bind(Client.class).toInstance(client); bind(ImprovedMenusConfig.class).toInstance(config); bind(TooltipManager.class).toInstance(tooltips);
             bind(ItemManager.class).toInstance(mock(ItemManager.class)); bind(ChatIconManager.class).toInstance(mock(ChatIconManager.class));
         } }).getInstance(MenuPresentation.class);
-        presentation.render(null); verifyNoInteractions(tooltips);
-        when(config.minimumOptions()).thenReturn(1); presentation.render(null);
+        presentation.queueOptionCount(); verifyNoInteractions(tooltips);
+        when(config.minimumOptions()).thenReturn(1); presentation.queueOptionCount();
         ArgumentCaptor<Tooltip> tooltip=ArgumentCaptor.forClass(Tooltip.class); verify(tooltips).add(tooltip.capture());
         assertEquals("<col=123abc>+1 options</col>",tooltip.getValue().getText());
         for (ImprovedMenusConfig.CountAnchor anchor : ImprovedMenusConfig.CountAnchor.values())
         {
-            clearInvocations(tooltips); when(config.countAnchor()).thenReturn(anchor); presentation.render(null);
+            clearInvocations(tooltips); when(config.countAnchor()).thenReturn(anchor); presentation.queueOptionCount();
             if (anchor==ImprovedMenusConfig.CountAnchor.ABOVE_LEFT || anchor==ImprovedMenusConfig.CountAnchor.ABOVE_RIGHT)
             { verify(tooltips).addFront(any(Tooltip.class)); verify(tooltips,never()).add(any(Tooltip.class)); }
             else { verify(tooltips).add(any(Tooltip.class)); verify(tooltips,never()).addFront(any(Tooltip.class)); }
         }
-        clearInvocations(tooltips); when(client.isMenuOpen()).thenReturn(true); presentation.render(null); verifyNoInteractions(tooltips);
+        clearInvocations(tooltips); when(client.isMenuOpen()).thenReturn(true); presentation.queueOptionCount(); verifyNoInteractions(tooltips);
     }
     @Test public void colorFallbackHandlesInvalidManualEdits()
     {

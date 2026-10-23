@@ -79,7 +79,11 @@ final class MenuPresentation extends Overlay
         {
             if (config.groundIcons()) { draw(graphics,client.getMenu()); }
         }
-        else if (config.optionCount())
+        return null;
+    }
+    void queueOptionCount()
+    {
+        if (!client.isMenuOpen() && config.optionCount())
         {
             int count=additionalCount(client.getMenu().getMenuEntries(),config.countExamine(),config.countOnWidgets(),config.countHidePlayers(),config.countHideWalkHere());
             if (count >= Math.max(1,config.minimumOptions()) && client.getMouseCanvasPosition().getX() >= 0)
@@ -93,7 +97,6 @@ final class MenuPresentation extends Overlay
                 else { tooltips.add(tooltip); }
             }
         }
-        return null;
     }
     static int additionalCount(MenuEntry[] entries)
     { return additionalCount(entries,true,true); }

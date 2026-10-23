@@ -42,6 +42,7 @@ public class PluginLifecycleTest
         for (int i=0;i<2;i++) { plugin.startUp(); SwingUtilities.invokeAndWait(() -> {}); plugin.shutDown(); SwingUtilities.invokeAndWait(() -> {}); }
         verify(mouse,times(2)).registerMouseListener(any()); verify(mouse,times(2)).unregisterMouseListener(any());
         verify(bus,times(2)).register(any(ButtonGuard.class)); verify(bus,times(2)).unregister(any(ButtonGuard.class));
+        verify(overlays,times(2)).add(any(OptionCountOverlay.class)); verify(overlays,times(2)).remove(any(OptionCountOverlay.class));
         verify(overlays,times(2)).add(any(MenuPresentation.class)); verify(overlays,times(2)).remove(any(MenuPresentation.class));
         verify(toolbar,times(2)).addNavigation(any(NavigationButton.class)); verify(toolbar,times(2)).removeNavigation(any(NavigationButton.class));
         verify(icons,times(1)).registerChatIcon(any());
