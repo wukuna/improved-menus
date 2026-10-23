@@ -38,7 +38,8 @@ public class OptionCountOrderingTest
         when(config.countOnWidgets()).thenReturn(true);
         when(config.optionCountColor()).thenReturn("#ff0000");
         Injector injector=Guice.createInjector(new AbstractModule() {
-            protected void configure() {
+            protected void configure() { bind(LootFiltersCompatibility.class).toInstance(mock(LootFiltersCompatibility.class));
+                bind(java.util.concurrent.ScheduledExecutorService.class).toInstance(mock(java.util.concurrent.ScheduledExecutorService.class));
                 bind(Client.class).toInstance(client);
                 bind(ImprovedMenusConfig.class).toInstance(config);
                 bind(RuneLiteConfig.class).toInstance(core);

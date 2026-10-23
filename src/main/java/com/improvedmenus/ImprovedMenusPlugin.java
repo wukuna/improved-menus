@@ -44,6 +44,7 @@ public class ImprovedMenusPlugin extends Plugin
     private Menu colorEditorMenu;
     private MenuEntry colorEditorEntry;
     private Menu colorEditorSubmenu;
+    private long lootRevision;
 
     @Provides ImprovedMenusConfig provideConfig(ConfigManager manager) { return manager.getConfig(ImprovedMenusConfig.class); }
     @Override protected void startUp()
@@ -52,7 +53,7 @@ public class ImprovedMenusPlugin extends Plugin
         presentation.setItemIcons(itemIcons);
         if(itemIcons.filters!=null) { itemIcons.filters.reload(); }
         renameNotice.startUp();
-        clientThread.invokeLater(() -> { if (active) { engine.reload(); } });
+        clientThread.invokeLater(() -> { if (active) { engine.reload(); lootCompatibility.refresh(); } });
         buttons.startUp(); eventBus.register(buttons); overlays.add(presentation); overlays.add(optionCounts); presentation.start();
         SwingUtilities.invokeLater(this::updateSidePanel);
     }
@@ -71,6 +72,17 @@ public class ImprovedMenusPlugin extends Plugin
     { if (!client.isMenuOpen()) { engine.apply(client.getMenu()); } }
     @Subscribe(priority=-1) public void onClientTick(ClientTick event)
     { if (client.getGameState() == GameState.LOGGED_IN && !client.isMenuOpen()) { engine.applyTargetProtections(client.getMenu()); } }
+    @Subscribe public void onGameTick(GameTick event)
+    {
+        if (!active) return;
+        lootCompatibility.refresh();
+        long revision=lootCompatibility.revision();
+        if (revision!=lootRevision)
+        {
+            lootRevision=revision;
+            if (client.isMenuOpen()) decorateMenu();
+        }
+    }
     @Subscribe(priority=-2) public void onMenuOpened(MenuOpened event)
     {
         presentation.stop(); lootMenu.stop();
@@ -83,11 +95,22 @@ public class ImprovedMenusPlugin extends Plugin
         if (ImprovedMenusConfig.GROUP.equals(event.getGroup()))
         {
             if(itemIcons.filters!=null && (event.getKey().equals(FilterIcons.KEY) || event.getKey().equals(FilterIcons.BACKUP))) { itemIcons.filters.reload(); }
-            clientThread.invokeLater(() -> { if (active) { presentation.stop(); lootMenu.stop(); lootCompatibility.reset(); engine.reload(); if(client.isMenuOpen()) decorateMenu(); } });
+            clientThread.invokeLater(() -> { if (active) { presentation.stop(); lootMenu.stop(); lootCompatibility.reset(); lootCompatibility.refresh(); engine.reload(); if(client.isMenuOpen()) decorateMenu(); } });
             if (event.getKey().equals("hideSidePanel")) { SwingUtilities.invokeLater(this::updateSidePanel); }
         }
+        else if (LocalFilterSettings.GROUP.equals(event.getGroup())) refreshLootFilter();
     }
-    @Subscribe public void onProfileChanged(net.runelite.client.events.ProfileChanged event) { clientThread.invokeLater(() -> { presentation.stop(); lootMenu.stop(); lootCompatibility.reset(); }); if(itemIcons.filters!=null) { itemIcons.filters.reload(); } }
+    @Subscribe public void onProfileChanged(net.runelite.client.events.ProfileChanged event) { refreshLootFilter(); if(itemIcons.filters!=null) { itemIcons.filters.reload(); } }
+    @Subscribe public void onPluginChanged(net.runelite.client.events.PluginChanged event)
+    { if ("Loot Filters".equals(event.getPlugin().getName())) refreshLootFilter(); }
+    private void refreshLootFilter()
+    {
+        clientThread.invokeLater(() -> {
+            if (!active) return;
+            presentation.stop(); lootMenu.stop(); lootCompatibility.reset(); lootCompatibility.refresh();
+            if (client.isMenuOpen()) decorateMenu();
+        });
+    }
     private void decorateMenu() {
         lootCompatibility.beginMenu();
         try { lootMenu.apply(client.getMenu()); presentation.decorate(client.getMenu()); }
@@ -104,8 +127,7 @@ public class ImprovedMenusPlugin extends Plugin
         }
         else if (navigation == null)
         {
-            panel=new ImprovedMenusPanel(store,engine,this::openSettings);
-            panel.addIconControls(itemIcons,lootCompatibility);
+            panel=new ImprovedMenusPanel(store,engine,this::openSettings,lootCompatibility::status);
             navigation=NavigationButton.builder().tooltip("Improved Right-Clicks").icon(icon()).priority(6).panel(panel).build();
             toolbar.addNavigation(navigation);
         }

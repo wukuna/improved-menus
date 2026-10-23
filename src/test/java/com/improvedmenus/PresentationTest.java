@@ -46,8 +46,8 @@ public class PresentationTest
         when(client.getMouseCanvasPosition()).thenReturn(new Point(10,10)); when(config.optionCount()).thenReturn(true);
         when(config.countExamine()).thenReturn(true); when(config.countOnWidgets()).thenReturn(true); when(config.minimumOptions()).thenReturn(2);
         when(config.optionCountColor()).thenReturn("#123abc");
-        MenuPresentation presentation=Guice.createInjector(new AbstractModule() { protected void configure() {
-            bind(net.runelite.client.config.RuneLiteConfig.class).toInstance(mock(net.runelite.client.config.RuneLiteConfig.class)); bind(Client.class).toInstance(client); bind(ImprovedMenusConfig.class).toInstance(config); bind(TooltipManager.class).toInstance(tooltips);
+        MenuPresentation presentation=Guice.createInjector(new AbstractModule() { protected void configure() { bind(LootFiltersCompatibility.class).toInstance(mock(LootFiltersCompatibility.class));
+            bind(java.util.concurrent.ScheduledExecutorService.class).toInstance(mock(java.util.concurrent.ScheduledExecutorService.class)); bind(net.runelite.client.config.RuneLiteConfig.class).toInstance(mock(net.runelite.client.config.RuneLiteConfig.class)); bind(Client.class).toInstance(client); bind(ImprovedMenusConfig.class).toInstance(config); bind(TooltipManager.class).toInstance(tooltips);
             bind(ItemManager.class).toInstance(mock(ItemManager.class)); bind(ChatIconManager.class).toInstance(mock(ChatIconManager.class));
         } }).getInstance(MenuPresentation.class);
         presentation.queueOptionCount(); verifyNoInteractions(tooltips);

@@ -64,7 +64,7 @@ final class MenuPresentation extends Overlay
                 ItemIcons.Assignment custom=source==ImprovedMenusConfig.GroundIconSource.NATIVE || source==null || itemIcons==null ? null : itemIcons.find(entry.getIdentifier());
                 LootFiltersCompatibility.Result linked=null;
                 if(custom==null && source!=null && source!=ImprovedMenusConfig.GroundIconSource.NATIVE) {
-                    if(config.lootFiltersCompatibility()) { linked=lootCompatibility.find(entry); if(linked!=null && linked.image==null) linked=null; }
+                    if(config.lootFiltersCompatibility()) { linked=lootCompatibility.findIcon(entry); if(linked!=null && !linked.hasIcon()) linked=null; }
                     else if(itemIcons!=null && itemIcons.filters!=null) { custom=itemIcons.filters.find(entry); }
                 }
                 if((source==ImprovedMenusConfig.GroundIconSource.CUSTOM || source==ImprovedMenusConfig.GroundIconSource.BOTH && config.bothRespectFilterVisibility()) && custom==null && linked==null) { continue; }
@@ -73,7 +73,7 @@ final class MenuPresentation extends Overlay
                 both |= source==ImprovedMenusConfig.GroundIconSource.BOTH && linked!=null && !linked.itemIcon;
                 String decorated = marker+(both ? marker : "")+original;
                 TargetEdit edit=new TargetEdit(entry,original,decorated);
-                edit.nativeAllowed=source!=ImprovedMenusConfig.GroundIconSource.CUSTOM && !(source==ImprovedMenusConfig.GroundIconSource.BOTH && config.bothRespectFilterVisibility()); edit.custom=custom; edit.linked=linked==null ? null : linked.image; edit.both=both;
+                edit.nativeAllowed=source!=ImprovedMenusConfig.GroundIconSource.CUSTOM && !(source==ImprovedMenusConfig.GroundIconSource.BOTH && config.bothRespectFilterVisibility()); edit.custom=custom; edit.linked=linked; edit.both=both;
                 if (decorated.equals(original)) { continue; }
                 ownedTargets.put(entry,edit);
                 entry.setTarget(decorated);
@@ -173,7 +173,7 @@ final class MenuPresentation extends Overlay
             int y=menu.getMenuY()+19+(entries.length-1-i-scroll)*15;
             if (y < menu.getMenuY()+19 || y+15 > menu.getMenuY()+menu.getMenuHeight()) { continue; }
             int x=menu.getMenuX()+8+metrics.stringWidth(MenuRules.plain(entry.getOption())+" ");
-            BufferedImage custom=edit.linked!=null ? edit.linked : edit.custom==null || itemIcons==null ? null : itemIcons.image(edit.custom,entry.getIdentifier());
+            BufferedImage custom=edit.linked!=null ? (edit.linked.image!=null ? edit.linked.image : lootCompatibility.image(edit.linked)) : edit.custom==null || itemIcons==null ? null : itemIcons.image(edit.custom,entry.getIdentifier());
             if(custom!=null) { g.drawImage(custom,x,y,17,15,null); }
             else if(edit.nativeAllowed) { g.drawImage(items.getImage(entry.getIdentifier(),Integer.MAX_VALUE,false),x,y,17,15,null); }
             if(edit.both && custom!=null) { g.drawImage(items.getImage(entry.getIdentifier(),Integer.MAX_VALUE,false),x+17,y,17,15,null); }
@@ -181,7 +181,7 @@ final class MenuPresentation extends Overlay
     }
     private static final class TargetEdit
     {
-        ItemIcons.Assignment custom; BufferedImage linked; boolean both, nativeAllowed;
+        ItemIcons.Assignment custom; LootFiltersCompatibility.Result linked; boolean both, nativeAllowed;
         final String original, decorated;
         final MenuAction type;
         final int identifier, param0, param1, worldView;
