@@ -60,7 +60,7 @@ final class ImprovedMenusPanel extends PluginPanel
         iconSection.add(new JLabel("Icon source"));
         JComboBox<ImprovedMenusConfig.GroundIconSource> source=new JComboBox<>(ImprovedMenusConfig.GroundIconSource.values()); fullWidth(source);
         iconSection.add(source);
-        iconSection.add(help("Native: item pictures. Custom: imported or assigned icons. Both: custom + item pictures."));
+        iconSection.add(help("Native: item pictures. Custom: visible imported or assigned icons only. Both: native + visible custom icons."));
         iconSection.add(help("Loot Filters setup is not linked automatically. Import the same Filterscape script here first."));
         button(iconSection,"Import Loot Filters script",() -> { openIconEditor(icons); iconEditor.importLoot(); });
         JLabel imported=help(""); iconSection.add(imported);

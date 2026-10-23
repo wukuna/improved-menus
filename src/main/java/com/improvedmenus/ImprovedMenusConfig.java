@@ -91,7 +91,7 @@ public interface ImprovedMenusConfig extends Config
         GroundIconSource(String label) { this.label=label; }
         @Override public String toString() { return label; }
     }
-    @ConfigItem(keyName="groundIconSource", name="Icon source", description="Used when Ground loot icons is enabled. Custom uses your imported or manually assigned icons. Both shows custom and item icons; missing assignments fall back to Native. Colors are controlled separately.", position=27, section=presentationSection)
+    @ConfigItem(keyName="groundIconSource", name="Icon source", description="Used when Ground loot icons is enabled. Custom shows only visible imported or manually assigned icons, with no native fallback. Both keeps native item icons and adds visible custom icons. Colors are controlled separately.", position=27, section=presentationSection)
     default GroundIconSource groundIconSource() { return GroundIconSource.NATIVE; }
     @ConfigItem(keyName="optionCount", name="Additional option count", description="Show the number of other available actions on hover", position=27, section=presentationSection)
     default boolean optionCount() { return false; }

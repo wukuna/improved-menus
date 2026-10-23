@@ -21,8 +21,18 @@ public final class LootFilter {
  }
  public BufferedImageProvider find(ItemFacts item) {
   BufferedImageProvider icon=null;
-  for(FilterRule r:rules) { if(r.getCond().test(null,item)) { if(r.getDisplay().getIcon()!=null) icon=r.getDisplay().getIcon(); if(r.isTerminal()) break; } }
-  return icon;
+  boolean hidden=false, hideOverlay=false, compact=false;
+  for(FilterRule r:rules) {
+   if(!r.getCond().test(null,item)) continue;
+   DisplayConfig display=r.getDisplay();
+   if(display.getIcon()!=null) icon=display.getIcon();
+   if(display.getHidden()!=null) hidden=display.getHidden();
+   if(display.getHideOverlay()!=null) hideOverlay=display.getHideOverlay();
+   if(display.getCompact()!=null) compact=display.getCompact();
+   if(r.isTerminal()) break;
+  }
+  if(hidden || hideOverlay) return null;
+  return compact ? new BufferedImageProvider.CurrentItem() : icon;
  }
  public Set<String> files() {
   Set<String> names=new LinkedHashSet<>();

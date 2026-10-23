@@ -19,9 +19,20 @@ public class ComplexIconTest {
   assertEquals(new BufferedImageProvider.Sprite(41,0),f.find(fact(0,1,2,100)));
   assertEquals(new BufferedImageProvider.CurrentItem(),f.find(fact(0,1,1,100)));
  }
- @Test public void terminalWithoutIconKeepsInheritedIconAndStops() {
+ @Test public void hiddenTerminalSuppressesInheritedIconAndStops() {
   LootFilter f=LootFilter.compile("apply (true) {icon=Item(995);} rule(name:\"Shark\") {hidden=true;} rule(true) {icon=Sprite(41,0);}");
-  assertEquals(new BufferedImageProvider.Item(995),f.find(fact(0,1,1,10)));
+  assertNull(f.find(fact(0,1,1,10)));
+ }
+ @Test public void finalVisibilityOverridesAndCompactFollowFilterMerging() {
+  ItemFacts item=fact(0,1,1,10);
+  assertNull(LootFilter.compile("rule(true) {textColor=\"#ffffff\";}").find(item));
+  assertNull(LootFilter.compile("apply(true) {icon=Item(995);} rule(true) {hideOverlay=true;}").find(item));
+  assertEquals(new BufferedImageProvider.Item(995),LootFilter.compile("apply(true) {icon=Item(995); hidden=true; hideOverlay=true;} rule(true) {hidden=false; hideOverlay=false;}").find(item));
+  assertNull(LootFilter.compile("apply(true) {icon=Item(995); hidden=true; hideOverlay=true;} rule(true) {hidden=false;}").find(item));
+  com.improvedmenus.rs2f.FilterRule always=LootFilter.compile("rule(true) {icon=Item(995);}").rules.get(0);
+  LootFilter compact=LootFilter.builder().addRule(new com.improvedmenus.rs2f.FilterRule(always.getCond(),com.improvedmenus.rs2f.DisplayConfig.builder().compact(true).build(),true,0)).build();
+  assertEquals(new BufferedImageProvider.CurrentItem(),compact.find(item));
+
  }
  @Test public void ironmanOwnershipAndAreaAreLiveConditions() {
   LootFilter f=LootFilter.compile("rule(accountType:1 && !ownership:2 && area:[3190,3190,0,3210,3210,0]) {icon=File(\"food/heart.png\");} rule(true) {icon=CurrentItem();}");
