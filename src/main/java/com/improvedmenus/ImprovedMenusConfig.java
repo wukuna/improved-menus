@@ -93,6 +93,8 @@ public interface ImprovedMenusConfig extends Config
     }
     @ConfigItem(keyName="groundIconSource", name="Icon source", description="Used when Ground loot icons is enabled. Custom shows only visible imported or manually assigned icons, with no native fallback. Both keeps native item icons and adds visible custom icons. Colors are controlled separately.", position=27, section=presentationSection)
     default GroundIconSource groundIconSource() { return GroundIconSource.NATIVE; }
+    @ConfigItem(keyName="bothRespectFilterVisibility", name="Both: respect filter visibility", description="In Both mode, show native and custom icons only when a visible custom icon is available. Hidden, unassigned or unavailable filter icons suppress both. Manual assignments still take priority. Native mode is unaffected.", position=29, section=presentationSection)
+    default boolean bothRespectFilterVisibility() { return false; }
     @ConfigItem(keyName="optionCount", name="Additional option count", description="Show the number of other available actions on hover", position=27, section=presentationSection)
     default boolean optionCount() { return false; }
     @ConfigItem(keyName="hideCancel", name="Hide Cancel", description="Hide Cancel in opened right-click menus; keep a safe fallback if nothing remains", position=1, section=hideOptionsSection)

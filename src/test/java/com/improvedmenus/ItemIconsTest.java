@@ -77,9 +77,9 @@ public class ItemIconsTest
         }
     }
     @Test public void unavailableCustomImageNeverDrawsNativeInCustomMode() {
-        for(ImprovedMenusConfig.GroundIconSource source: new ImprovedMenusConfig.GroundIconSource[]{ImprovedMenusConfig.GroundIconSource.CUSTOM,ImprovedMenusConfig.GroundIconSource.BOTH}) {
+        for(ImprovedMenusConfig.GroundIconSource source: new ImprovedMenusConfig.GroundIconSource[]{ImprovedMenusConfig.GroundIconSource.CUSTOM,ImprovedMenusConfig.GroundIconSource.BOTH}) for(boolean respect:new boolean[]{false,true}) {
             Client client=mock(Client.class); net.runelite.client.game.ItemManager itemManager=mock(net.runelite.client.game.ItemManager.class);
-            MenuPresentation p=presentation(source,client,itemManager);
+            MenuPresentation p=presentation(source,client,itemManager,respect);
             ItemIcons library=mock(ItemIcons.class); ItemIcons.Assignment a=new ItemIcons.Assignment(); a.kind=ItemIcons.Kind.IMAGE;
             when(library.find(385)).thenReturn(a); p.setItemIcons(library);
             MenuEntry entry=UserCombinationAuditTest.e("Take","Shark",MenuAction.GROUND_ITEM_THIRD_OPTION,385,0);
@@ -89,9 +89,22 @@ public class ItemIconsTest
             p.decorate(menu);
             java.awt.Graphics2D graphics=new java.awt.image.BufferedImage(300,100,2).createGraphics();
             try { p.render(graphics); } finally { graphics.dispose(); }
-            if(source==ImprovedMenusConfig.GroundIconSource.CUSTOM) verifyNoInteractions(itemManager);
+            if(source==ImprovedMenusConfig.GroundIconSource.CUSTOM || respect) verifyNoInteractions(itemManager);
             else verify(itemManager).getImage(385,Integer.MAX_VALUE,false);
             p.stop(); assertEquals("Shark",entry.getTarget());
+        }
+    }
+    @Test public void respectingFilterVisibilityInBothIsOptionalAndKeepsVisiblePairs() {
+        assertFalse(new ImprovedMenusConfig() {}.bothRespectFilterVisibility());
+        assertTrue(SettingsCatalog.ALL.containsKey("bothRespectFilterVisibility"));
+        for(ImprovedMenusConfig.GroundIconSource source:ImprovedMenusConfig.GroundIconSource.values()) {
+            MenuPresentation p=presentation(source,mock(Client.class),mock(net.runelite.client.game.ItemManager.class),true);
+            ItemIcons library=mock(ItemIcons.class); library.filters=mock(FilterIcons.class); p.setItemIcons(library);
+            MenuEntry e=UserCombinationAuditTest.e("Take","Shark",MenuAction.GROUND_ITEM_THIRD_OPTION,385,0);
+            p.decorate(UserCombinationAuditTest.menu(e)); assertEquals(source==ImprovedMenusConfig.GroundIconSource.NATIVE ? "<img=4>Shark" : "Shark",e.getTarget());
+            p.stop(); ItemIcons.Assignment a=new ItemIcons.Assignment(); a.kind=ItemIcons.Kind.HEART;
+            when(library.filters.find(e)).thenReturn(a);
+            p.decorate(UserCombinationAuditTest.menu(e)); assertEquals(source==ImprovedMenusConfig.GroundIconSource.BOTH ? "<img=4><img=4>Shark" : "<img=4>Shark",e.getTarget()); p.stop();
         }
     }
     private MenuPresentation presentation(ImprovedMenusConfig.GroundIconSource source)
@@ -99,8 +112,10 @@ public class ItemIconsTest
         return presentation(source,mock(Client.class),mock(net.runelite.client.game.ItemManager.class));
     }
     private MenuPresentation presentation(ImprovedMenusConfig.GroundIconSource source,Client client,net.runelite.client.game.ItemManager itemManager)
+    { return presentation(source,client,itemManager,false); }
+    private MenuPresentation presentation(ImprovedMenusConfig.GroundIconSource source,Client client,net.runelite.client.game.ItemManager itemManager,boolean respect)
     {
-        ImprovedMenusConfig config=mock(ImprovedMenusConfig.class); when(config.groundIcons()).thenReturn(true); when(config.groundIconSource()).thenReturn(source);
+        ImprovedMenusConfig config=mock(ImprovedMenusConfig.class); when(config.groundIcons()).thenReturn(true); when(config.groundIconSource()).thenReturn(source); when(config.bothRespectFilterVisibility()).thenReturn(respect);
         net.runelite.client.game.ChatIconManager icons=mock(net.runelite.client.game.ChatIconManager.class); when(icons.registerChatIcon(any())).thenReturn(2); when(icons.chatIconIndex(2)).thenReturn(4);
         MenuPresentation p=com.google.inject.Guice.createInjector(new com.google.inject.AbstractModule(){ protected void configure(){
             bind(net.runelite.client.config.RuneLiteConfig.class).toInstance(mock(net.runelite.client.config.RuneLiteConfig.class)); bind(Client.class).toInstance(client); bind(ImprovedMenusConfig.class).toInstance(config); bind(net.runelite.client.game.ChatIconManager.class).toInstance(icons);

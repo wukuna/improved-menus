@@ -97,6 +97,8 @@ Tool guards leave the knife-cut Temple Trekking swamp vines and quest Cave entra
 
 Open **Ground loot menu icons** in the side panel, enable **Show icons in Take menus**, and select **Native**, **Custom**, or **Both**. Native shows item pictures; Custom shows imported or manually assigned icons; Both shows custom and item pictures together. Custom leaves items without a visible assigned icon undecorated; it never substitutes a native icon for a missing custom image. Both retains the native item picture when no custom icon is visible. Imported filters honor the final `hidden` and `hideOverlay` values after matching rule overrides. Manually assigned item icons take priority over imported filter rules. Both avoids duplicating Current Item or the same item ID. Menu colors stay separate.
 
+Enable **Both: respect filter visibility** under Presentation to show both icons only when a visible custom icon exists. Hidden, unassigned or unavailable custom icons then suppress both pictures. The option defaults off, does not affect Native mode, and is included in profiles, import/export and undo. Manual assignments remain explicit overrides.
+
 **Loot Filters is not linked automatically.** Click **Import Loot Filters script** and import the same Filterscape export you use there. Confirm the import; its rule count appears in the side panel. Import again when you change that script. The original Loot Filters setup is never modified.
 
 Choose **Manage icons / backups** to assign Heart, Star, Diamond, Current Item or an image file to an exact item name. Use tradeable-item search or enter an untradeable item's exact name. Manual assignments take priority over the imported filter; the editor labels them separately from imported rules.

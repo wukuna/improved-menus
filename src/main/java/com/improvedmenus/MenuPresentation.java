@@ -62,12 +62,12 @@ final class MenuPresentation extends Overlay
                 ImprovedMenusConfig.GroundIconSource source=config.groundIconSource();
                 ItemIcons.Assignment custom=source==ImprovedMenusConfig.GroundIconSource.NATIVE || source==null || itemIcons==null ? null : itemIcons.find(entry.getIdentifier());
                 if(custom==null && source!=null && source!=ImprovedMenusConfig.GroundIconSource.NATIVE && itemIcons!=null && itemIcons.filters!=null) { custom=itemIcons.filters.find(entry); }
-                if(source==ImprovedMenusConfig.GroundIconSource.CUSTOM && custom==null) { continue; }
+                if((source==ImprovedMenusConfig.GroundIconSource.CUSTOM || source==ImprovedMenusConfig.GroundIconSource.BOTH && config.bothRespectFilterVisibility()) && custom==null) { continue; }
                 boolean both=source==ImprovedMenusConfig.GroundIconSource.BOTH && custom!=null
                     && custom.kind!=ItemIcons.Kind.CURRENT_ITEM && !(custom.kind==ItemIcons.Kind.ITEM && custom.iconId==entry.getIdentifier());
                 String decorated = marker+(both ? marker : "")+original;
                 TargetEdit edit=new TargetEdit(entry,original,decorated);
-                edit.custom=custom; edit.both=both; edit.nativeAllowed=source!=ImprovedMenusConfig.GroundIconSource.CUSTOM;
+                edit.custom=custom; edit.both=both; edit.nativeAllowed=source!=ImprovedMenusConfig.GroundIconSource.CUSTOM && !(source==ImprovedMenusConfig.GroundIconSource.BOTH && config.bothRespectFilterVisibility());
                 if (decorated.equals(original)) { continue; }
                 ownedTargets.put(entry,edit);
                 entry.setTarget(decorated);
