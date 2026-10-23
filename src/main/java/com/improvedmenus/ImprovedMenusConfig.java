@@ -93,6 +93,10 @@ public interface ImprovedMenusConfig extends Config
     }
     @ConfigItem(keyName="lootFiltersCompatibility", name="Loot Filters compatibility", description="Use icons selected by a compatible Loot Filters version without importing files. Requires Custom or Both. Colors stay separate. Custom omits hidden or unavailable icons; Both retains native item icons.", position=27, section=presentationSection)
     default boolean lootFiltersCompatibility() { return false; }
+    @ConfigItem(keyName="useLootFiltersInMenu", name="Use Loot Filters in menu", description="Use Loot Filters ordering and hidden-item priority for Take rows in opened menus. Does not remove actions or change left-click behavior. Icons keep their own settings; colors use the separate color option.", position=27, section=presentationSection)
+    default boolean useLootFiltersInMenu() { return false; }
+    @ConfigItem(keyName="lootFiltersMenuColors", name="Use Loot Filters menu colors", description="With Use Loot Filters in menu enabled, use its item-name colors in opened Take menus. Does not change your saved action colors or icon source.", position=18, section=colorsSection)
+    default boolean lootFiltersMenuColors() { return false; }
     @ConfigItem(keyName="groundIconSource", name="Icon source", description="Used when Ground loot icons is enabled. Custom uses Loot Filters when compatibility is enabled, otherwise imported icons. Manual assignments take priority. Both shows custom and item icons; Custom never falls back to native icons; Both keeps native item icons when a custom icon is unavailable. Colors are controlled separately.", position=28, section=presentationSection)
     default GroundIconSource groundIconSource() { return GroundIconSource.NATIVE; }
     @ConfigItem(keyName="bothRespectFilterVisibility", name="Both: respect filter visibility", description="In Both mode, show native and custom icons only when a visible custom icon is available. Hidden, unassigned or unavailable filter icons suppress both. Manual assignments still take priority. Native mode is unaffected.", position=29, section=presentationSection)
@@ -120,6 +124,13 @@ public interface ImprovedMenusConfig extends Config
     default boolean countExamine() { return true; }
     @ConfigItem(keyName="countOnWidgets", name="Show count on interface widgets", description="Show counts on inventory, bank, shop and other interface widgets", position=41, section=presentationSection)
     default boolean countOnWidgets() { return true; }
+    @ConfigItem(keyName="countHidePlayers", name="Hide player option counts", description="Exclude player actions from the hover count without hiding overlapping loot or object options", position=44, section=presentationSection)
+    default boolean countHidePlayers() { return false; }
+    @ConfigItem(keyName="countHideWalkHere", name="Hide counts when Walk here", description="Exclude deprioritized NPC and object options when Walk here is the preferred action; loot and interface options remain counted", position=45, section=presentationSection)
+    default boolean countHideWalkHere() { return false; }
+    enum CountAnchor { BELOW_LEFT, BELOW_RIGHT, ABOVE_LEFT, ABOVE_RIGHT }
+    @ConfigItem(keyName="countAnchor", name="Option count anchor", description="Position relative to the hover tooltip stack; RuneLite still controls whether the stack is above or below the cursor", position=46, section=presentationSection)
+    default CountAnchor countAnchor() { return CountAnchor.BELOW_LEFT; }
     @ConfigItem(keyName="optionCountColor", name="Option count text color", description="Color in #RRGGBB format", position=42, section=presentationSection)
     default String optionCountColor() { return "#ffffff"; }
     @ConfigItem(keyName="defaultPickerColor", name="Default picker color", description="Initial color for entries with no matching color rule, in #RRGGBB format", position=43, section=colorsSection)

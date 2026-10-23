@@ -1,6 +1,9 @@
 package com.improvedmenus;
 
+import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.UUID;
 import javax.inject.Inject;
@@ -20,14 +23,25 @@ class LootFiltersCompatibility {
     @Inject private EventBus events;
     private String pending;
     private Result result;
+    private boolean collecting;
+    private final Map<Tile, Map<Integer, Result>> menuResults = new IdentityHashMap<>();
     private volatile String status = "Open a Take menu to check Loot Filters compatibility.";
     static final class Result {
         final BufferedImage image;
         final boolean itemIcon;
-        Result(BufferedImage image, boolean itemIcon) { this.image=image; this.itemIcon=itemIcon; }
+        final boolean hidden, hideOverlay, deprioritized;
+        final int menuSort;
+        final Color menuColor;
+        Result(BufferedImage image, boolean itemIcon) { this(image,itemIcon,false,false,0,false,null); }
+        Result(BufferedImage image, boolean itemIcon, boolean hidden, boolean hideOverlay, int menuSort, boolean deprioritized, Color menuColor) {
+            this.image=image; this.itemIcon=itemIcon; this.hidden=hidden; this.hideOverlay=hideOverlay;
+            this.menuSort=menuSort; this.deprioritized=deprioritized; this.menuColor=menuColor;
+        }
     }
     String status() { return status; }
-    void reset() { pending=null; result=null; status="Open a Take menu to check Loot Filters compatibility."; }
+    void reset() { pending=null; result=null; endMenu(); status="Open a Take menu to check Loot Filters compatibility."; }
+    void beginMenu() { menuResults.clear(); collecting=true; }
+    void endMenu() { menuResults.clear(); collecting=false; }
     Result find(MenuEntry entry) {
         if (!client.isClientThread()) return null;
         WorldView view=client.getWorldView(entry.getWorldViewId());
@@ -37,27 +51,46 @@ class LootFiltersCompatibility {
         if(tiles==null || plane<0 || plane>=tiles.length || tiles[plane]==null
             || x<0 || x>=tiles[plane].length || tiles[plane][x]==null
             || y<0 || y>=tiles[plane][x].length || tiles[plane][x][y]==null) return null;
-        return request(tiles[plane][x][y],entry.getIdentifier());
+        Tile tile=tiles[plane][x][y];
+        if(!collecting) return request(tile,entry.getIdentifier());
+        Map<Integer,Result> tileResults=menuResults.computeIfAbsent(tile,ignored -> new HashMap<>());
+        int id=entry.getIdentifier();
+        if(!tileResults.containsKey(id)) tileResults.put(id,request(tile,id));
+        return tileResults.get(id);
     }
     Result request(Tile tile, int itemId) {
+        if(!client.isClientThread()) return null;
         pending=UUID.randomUUID().toString(); result=null;
-        status="Compatible Loot Filters not responding; no filter icon available.";
+        status="Compatible Loot Filters not responding; no display settings available.";
         try {
-            events.post(new PluginMessage("loot-filters","menu-icon-request-v1",
+            events.post(new PluginMessage("loot-filters","resolved-display-request-v1",
                 Map.of("requestId",pending,"tile",tile,"itemId",itemId)));
             return result;
         } finally { pending=null; result=null; }
     }
     @Subscribe public void onPluginMessage(PluginMessage message) {
-        if(pending==null || !"loot-filters".equals(message.getNamespace())
-            || !"menu-icon-response-v1".equals(message.getName())
+        if(!client.isClientThread() || pending==null || !"loot-filters".equals(message.getNamespace())
+            || !"resolved-display-response-v1".equals(message.getName())
             || !pending.equals(message.getData().get("requestId"))) return;
         Map<String,Object> data=message.getData();
-        if("ok".equals(data.get("status")) && data.get("icon") instanceof BufferedImage) {
-            result=new Result((BufferedImage)data.get("icon"),Boolean.TRUE.equals(data.get("itemIcon")));
-            status="Connected to Loot Filters. Its selected icons appear in Take menus.";
+        result=decode(data);
+        if(result!=null) {
+            status="Connected to Loot Filters. Icon source, menu behavior and colors use their separate settings.";
         } else {
-            status="Connected to Loot Filters; no visible, unambiguous icon available for this item.";
+            status="Loot Filters responded; this item has no ready, unambiguous display settings.";
         }
+    }
+    static Result decode(Map<String,Object> data) {
+        if(!"ok".equals(data.get("status")) || !(data.get("display") instanceof Map) || !(data.get("menu") instanceof Map)) return null;
+        Map<?,?> display=(Map<?,?>)data.get("display"), menu=(Map<?,?>)data.get("menu");
+        if(!(display.get("hidden") instanceof Boolean) || !(display.get("hideOverlay") instanceof Boolean)
+            || !(menu.get("sort") instanceof Integer) || !(menu.get("deprioritized") instanceof Boolean)
+            || !(menu.get("textColor") instanceof Color) || !(data.get("itemIcon") instanceof Boolean)) return null;
+        Object iconStatus=data.get("iconStatus");
+        if(!"ready".equals(iconStatus) && !"hidden".equals(iconStatus) && !"none".equals(iconStatus) && !"not-ready".equals(iconStatus)) return null;
+        if("ready".equals(iconStatus) && !(data.get("icon") instanceof BufferedImage)) return null;
+        boolean hidden=(Boolean)display.get("hidden"), hideOverlay=(Boolean)display.get("hideOverlay");
+        BufferedImage image=!hidden && !hideOverlay && "ready".equals(iconStatus) ? (BufferedImage)data.get("icon") : null;
+        return new Result(image,(Boolean)data.get("itemIcon"),hidden,hideOverlay,(Integer)menu.get("sort"),(Boolean)menu.get("deprioritized"),(Color)menu.get("textColor"));
     }
 }

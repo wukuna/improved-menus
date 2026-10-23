@@ -95,7 +95,7 @@ Tool guards leave the knife-cut Temple Trekking swamp vines and quest Cave entra
 
 ### Custom ground-menu icons
 
-Open **Ground loot menu icons** in the side panel, enable **Show icons in Take menus**, and select **Native**, **Custom**, or **Both**. Native shows item pictures; Custom shows imported or manually assigned icons; Both shows custom and item pictures together. Custom shows no icon when the filter icon is hidden, absent or unavailable; Both retains the native item icon. Both avoids duplicating Current Item or the same item ID. Menu colors stay separate.
+Open **Ground loot menu icons** in the side panel, enable **Show icons in Take menus**, and select **Native**, **Custom**, or **Both**. Native shows item pictures; Custom shows imported or manually assigned icons; Both shows custom and item pictures together. Custom leaves items without a visible assigned icon undecorated; it never substitutes a native icon for a missing custom image. Both retains the native item picture when no custom icon is visible. Imported filters honor the final `hidden` and `hideOverlay` values after matching rule overrides. Manually assigned item icons take priority over imported filter rules. Both avoids duplicating Current Item or the same item ID. Menu colors stay separate.
 
 Enable **Both: respect filter visibility** under Presentation to show both icons only when a visible custom icon exists. Hidden, unassigned or unavailable custom icons then suppress both pictures. The option defaults off, does not affect Native mode, and is included in profiles, import/export and undo. Manual assignments remain explicit overrides.
 
@@ -118,3 +118,24 @@ The RS2F lexer, preprocessor, parser, condition classes and preamble are adapted
 Enable **Loot Filters compatibility** directly above **Icon source**, then choose **Custom** or **Both**. A supporting Loot Filters version supplies its selected icons, including custom images, to Take menus automatically. Native uses ordinary item pictures. Colors remain controlled separately. No script or image upload is required for the connection.
 
 Until the proposed Loot Filters message API is released, the connection supplies no custom icon. Custom leaves the row undecorated; Both retains its native icon. Existing saved assignments and imported backups remain intact; turn compatibility off to use the existing imported rules. Manual item assignments continue to take priority. The side panel reports whether Loot Filters responded after opening a Take menu.
+
+**Use Loot Filters in menu** is a separate, optional setting under Presentation. It uses the provider's resolved ordering and hidden-item priority for Take rows in opened menus. It keeps every action available and leaves non-loot rows in their existing positions. It does not change normal left-click behavior, saved menu rules, or icon selection. Hidden ground overlays are not treated as instructions to delete Take actions.
+
+**Use Loot Filters menu colors**, under Colors, additionally applies the provider's resolved item-name color when **Use Loot Filters in menu** is on. Your action-color rules stay separate. Both new switches default off. They are included in settings profiles, import/export and undo.
+
+| Settings | Result |
+| --- | --- |
+| Menu integration off | Existing menu behavior and colors; icon settings still work independently |
+| Menu integration on, menu colors off | Loot Filters Take-row ordering/priority; existing colors |
+| Menu integration on, menu colors on | Loot Filters Take-row ordering/priority and item-name colors |
+| Icon source Native | Native item pictures, regardless of the menu switches |
+| Icon source Custom / Both with compatibility on | Resolved Loot Filters icons; existing manual overrides and Both visibility option remain in effect |
+| Provider unavailable or conflicting stacks | No extra menu changes; existing Custom/Both fallback behavior |
+
+The connection uses the proposed `resolved-display-request-v1` / `resolved-display-response-v1` protocol. It requests already evaluated settings when opening a menu, including cached custom images; it does not read another plugin's files or re-evaluate its scripts. No sounds or ground overlays are created by this integration. Loot Filters' own menu changes continue to be controlled by that plugin.
+
+### Additional option indicator
+
+Under Presentation, **Hide player option counts** excludes player actions while retaining loot and object actions underneath them. **Hide counts when Walk here** suppresses deprioritized NPC/object counts when walking is preferred; ground items and widgets remain eligible. These switches affect only the hover indicator, not the menu entries. Both start off.
+
+**Option count anchor** offers Below left (the existing default), Below right, Above left and Above right relative to the tooltip stack. RuneLite still controls the stack position relative to the cursor. All options are saved in profiles and support import/export and undo.

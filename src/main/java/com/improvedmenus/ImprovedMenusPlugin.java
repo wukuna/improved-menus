@@ -34,8 +34,10 @@ public class ImprovedMenusPlugin extends Plugin
     @Inject private ClientToolbar toolbar;
     @Inject private OverlayManager overlays;
     @Inject private MenuPresentation presentation;
+    @Inject private OptionCountOverlay optionCounts;
     @Inject private ItemIcons itemIcons;
     @Inject private LootFiltersCompatibility lootCompatibility;
+    @Inject private LootFiltersMenuPresentation lootMenu;
     private ImprovedMenusPanel panel;
     private NavigationButton navigation;
     private volatile boolean active;
@@ -52,16 +54,16 @@ public class ImprovedMenusPlugin extends Plugin
         if(itemIcons.filters!=null) { itemIcons.filters.reload(); }
         renameNotice.startUp();
         clientThread.invokeLater(() -> { if (active) { engine.reload(); } });
-        buttons.startUp(); eventBus.register(buttons); overlays.add(presentation); presentation.start();
+        buttons.startUp(); eventBus.register(buttons); overlays.add(presentation); overlays.add(optionCounts); presentation.start();
         SwingUtilities.invokeLater(this::updateSidePanel);
     }
     @Override protected void shutDown()
     {
         active=false;
         renameNotice.shutDown();
-        eventBus.unregister(lootCompatibility); lootCompatibility.reset();
-        eventBus.unregister(buttons); buttons.shutDown(); overlays.remove(presentation);
-        clientThread.invoke(() -> { removeColorEditor(); presentation.stop(); engine.clear(); }); store.clearHistory();
+        eventBus.unregister(lootCompatibility);
+        eventBus.unregister(buttons); buttons.shutDown(); overlays.remove(presentation); overlays.remove(optionCounts);
+        clientThread.invoke(() -> { removeColorEditor(); presentation.stop(); lootMenu.stop(); lootCompatibility.reset(); engine.clear(); }); store.clearHistory();
         SwingUtilities.invokeLater(() -> {
             if (panel != null) { panel.stop(); panel=null; }
             if (navigation != null) { toolbar.removeNavigation(navigation); navigation=null; }
@@ -73,7 +75,9 @@ public class ImprovedMenusPlugin extends Plugin
     { if (client.getGameState() == GameState.LOGGED_IN && !client.isMenuOpen()) { engine.applyTargetProtections(client.getMenu()); } }
     @Subscribe(priority=-2) public void onMenuOpened(MenuOpened event)
     {
-        engine.applyOpened(client.getMenu()); presentation.decorate(client.getMenu());
+        presentation.stop(); lootMenu.stop();
+        engine.applyOpened(client.getMenu());
+        decorateMenu();
         if (config.colorPicker() && client.isKeyPressed(KeyCode.KC_SHIFT)) { addColorEditor(client.getMenu()); }
     }
     @Subscribe public void onConfigChanged(ConfigChanged event)
@@ -81,11 +85,16 @@ public class ImprovedMenusPlugin extends Plugin
         if (ImprovedMenusConfig.GROUP.equals(event.getGroup()))
         {
             if(itemIcons.filters!=null && (event.getKey().equals(FilterIcons.KEY) || event.getKey().equals(FilterIcons.BACKUP))) { itemIcons.filters.reload(); }
-            clientThread.invokeLater(() -> { if (active) { if (!config.groundIcons()) { presentation.stop(); } engine.reload(); } });
+            clientThread.invokeLater(() -> { if (active) { presentation.stop(); lootMenu.stop(); lootCompatibility.reset(); engine.reload(); if(client.isMenuOpen()) decorateMenu(); } });
             if (event.getKey().equals("hideSidePanel")) { SwingUtilities.invokeLater(this::updateSidePanel); }
         }
     }
-    @Subscribe public void onProfileChanged(net.runelite.client.events.ProfileChanged event) { lootCompatibility.reset(); if(itemIcons.filters!=null) { itemIcons.filters.reload(); } }
+    @Subscribe public void onProfileChanged(net.runelite.client.events.ProfileChanged event) { clientThread.invokeLater(() -> { presentation.stop(); lootMenu.stop(); lootCompatibility.reset(); }); if(itemIcons.filters!=null) { itemIcons.filters.reload(); } }
+    private void decorateMenu() {
+        lootCompatibility.beginMenu();
+        try { lootMenu.apply(client.getMenu()); presentation.decorate(client.getMenu()); }
+        finally { lootCompatibility.endMenu(); }
+    }
     @Subscribe public void onBeforeMenuRender(BeforeMenuRender event)
     { if (active && client.isMenuOpen()) { engine.highlightHovered(client.getMenu()); } }
     private void updateSidePanel()
@@ -114,7 +123,7 @@ public class ImprovedMenusPlugin extends Plugin
     }
     @Subscribe public void onGameStateChanged(GameStateChanged event)
     {
-        if (event.getGameState() != GameState.LOGGED_IN) { buttons.reset(); engine.clear(); }
+        if (event.getGameState() != GameState.LOGGED_IN) { presentation.stop(); lootMenu.stop(); lootCompatibility.reset(); buttons.reset(); engine.clear(); }
         else { renameNotice.showIfLoggedIn(); }
     }
     @Subscribe public void onFocusChanged(FocusChanged event) { if (!event.isFocused()) { clientThread.invoke(buttons::reset); } }

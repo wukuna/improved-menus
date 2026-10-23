@@ -66,6 +66,7 @@ final class ImprovedMenusPanel extends PluginPanel
         JLabel imported=help(""); iconSection.add(imported);
         button(iconSection,"Manage icons / backups",() -> openIconEditor(icons));
         iconSection.add(help("Colors stay separate. Icons are saved per RuneLite profile."));
+        iconSection.add(help("Plugin Settings also has optional Use Loot Filters in menu ordering and a separate menu color switch. Both start off."));
         boolean[] syncing={false};
         refreshIcons=() -> {
             syncing[0]=true;
@@ -73,11 +74,11 @@ final class ImprovedMenusPanel extends PluginPanel
             linked.setSelected(config.lootFiltersCompatibility());
             source.setSelectedItem(config.groundIconSource());
             syncing[0]=false;
-            String text=wrapped(config.lootFiltersCompatibility() ? compatibility.status() : icons.filters.status());
+            String text=wrapped(config.lootFiltersCompatibility() || config.useLootFiltersInMenu() ? compatibility.status() : icons.filters.status());
             if(!text.equals(imported.getText())) { imported.setText(text); revalidate(); }
         };
         enabled.addActionListener(e -> { if(!syncing[0]) icons.configs.setConfiguration(ImprovedMenusConfig.GROUP,"groundIcons",enabled.isSelected()); });
-        linked.addActionListener(e -> { if(!syncing[0]) { compatibility.reset(); icons.configs.setConfiguration(ImprovedMenusConfig.GROUP,"lootFiltersCompatibility",linked.isSelected()); } });
+        linked.addActionListener(e -> { if(!syncing[0]) icons.configs.setConfiguration(ImprovedMenusConfig.GROUP,"lootFiltersCompatibility",linked.isSelected()); });
         source.addActionListener(e -> { if(!syncing[0]) icons.configs.setConfiguration(ImprovedMenusConfig.GROUP,"groundIconSource",source.getSelectedItem()); });
         refreshIcons.run();
     }
